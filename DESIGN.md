@@ -87,6 +87,7 @@ No text colour can contrast with both a dark background and bright particles (wh
 
 ## Fullscreen button
 
-- 56px frosted square, bottom-right (40px from the right, 74px from the bottom, above the counter); corner-arrows icon that swaps to "exit".
-- Tooltip "Fullscreen · F" / "Exit fullscreen · F".
-- Shown on slide 1 until fullscreen is entered; elsewhere it shares the dots' bottom-edge hover reveal.
+- Labelled pill at top centre, 30px from the top: accent corner-arrows icon, "Fullscreen" (body font 22px, 600), and an `F` key hint in mono. It switches to "Exit fullscreen" when active.
+- Frosted 78% bg, 1px line border; on hover the border turns accent.
+- Shown on slide 1 until fullscreen is entered; elsewhere when the pointer is in the top 14% of the stage, hiding 2s after it leaves.
+- The `?` help banner sits below it (top 108px) so the two never overlap.

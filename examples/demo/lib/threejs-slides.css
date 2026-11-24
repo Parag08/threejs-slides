@@ -222,17 +222,16 @@ body.ts-body .slide { text-shadow: 0 0 2px var(--halo), 0 0 8px var(--halo), 0 2
 .ts-dot:hover::after, .ts-dot:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 .ts-dot:first-child::after { left: 0; transform: translate(0, 6px); } .ts-dot:first-child:hover::after { transform: translate(0, 0); }
 .ts-dot:last-child::after { left: auto; right: 0; transform: translate(0, 6px); } .ts-dot:last-child:hover::after { transform: translate(0, 0); }
-.ts-fs { all: unset; position: absolute; right: 40px; bottom: 74px; width: 56px; height: 56px; display: grid; place-items: center; cursor: pointer; border-radius: 16px;
-  color: var(--fg); background: color-mix(in srgb, var(--bg) 78%, transparent); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .35s ease, transform .45s cubic-bezier(.16,1,.3,1), background .2s; }
-.ts-fs.is-shown { opacity: 1; transform: none; pointer-events: auto; }
-.ts-fs:hover { background: color-mix(in srgb, var(--fg) 14%, var(--bg)); }
+.ts-fs { all: unset; position: absolute; left: 50%; top: 30px; display: inline-flex; align-items: center; gap: 14px; height: 56px; padding: 0 22px 0 18px;
+  border-radius: 999px; cursor: pointer; color: var(--fg); font-family: var(--font-body); font-size: 22px; font-weight: 600; letter-spacing: 0.01em;
+  background: color-mix(in srgb, var(--bg) 78%, transparent); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  opacity: 0; transform: translate(-50%, -14px); pointer-events: none; transition: opacity .35s ease, transform .45s cubic-bezier(.16,1,.3,1), background .2s, border-color .2s; }
+.ts-fs.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.ts-fs:hover { background: color-mix(in srgb, var(--fg) 12%, var(--bg)); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
 .ts-fs:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.ts-fs svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.ts-fs::after { content: attr(data-label); position: absolute; right: 0; bottom: 70px; white-space: nowrap; font-family: var(--font-body); font-size: 22px; font-weight: 500;
-  padding: 10px 16px; border-radius: 12px; background: color-mix(in srgb, var(--bg) 92%, transparent); border: 1px solid var(--line); opacity: 0; transition: opacity .2s; pointer-events: none; }
-.ts-fs:hover::after, .ts-fs:focus-visible::after { opacity: 1; }
-.ts-help { position: absolute; left: 50%; top: 40px; transform: translateX(-50%); font-size: 20px; padding: 14px 26px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 85%, transparent); border: 1px solid var(--line); color: var(--muted); }
+.ts-fs svg { width: 24px; height: 24px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.ts-fs kbd { font-family: var(--font-mono); font-size: 17px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin-left: 2px; }
+.ts-help { position: absolute; left: 50%; top: 108px; transform: translateX(-50%); font-size: 20px; padding: 14px 26px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 85%, transparent); border: 1px solid var(--line); color: var(--muted); }
 .ts-help b { color: var(--fg); margin-right: 10px; }
 
 /* === REDUCED MOTION ======================================================= */

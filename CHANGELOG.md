@@ -5,7 +5,7 @@
 - Readability: text halo + per-layout scrim, 3D dimmed when it sits behind text (`data-dim`), solid higher-contrast text colours (`--text-2`, brighter `--muted`), pale-tint kicker
 - 3D labels get a halo; orbit's centre label now sits above the diagram
 - Orbit and bars scenes about 20% less bright; new `data-brightness` per slide
-- Fullscreen button: shown on the first slide until you go fullscreen, otherwise on hover near the bottom edge
+- Fullscreen button: a labelled pill at top centre, shown on the first slide until you go fullscreen, otherwise on hover near the top edge
 - Slide dots: click to jump, title tooltips; shown on the last slide and on hover near the bottom edge (`data-dots`)
 
 ## 1.0.0 (2026-11-24)

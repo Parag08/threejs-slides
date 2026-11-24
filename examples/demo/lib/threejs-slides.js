@@ -391,7 +391,7 @@ async function createDeck(options = {}) {
     return b;
   });
   if (cfg.dots !== 'none') chrome.appendChild(dotsNav);
-  /* --- Fullscreen button: same reveal as the dots (pointer near the bottom edge). F key still works. --- */
+  /* --- Fullscreen button, top-centre pill: shown on slide 1 until fullscreen, else when the pointer nears the top edge. F key still works. --- */
   const fsBtn = document.createElement('button');
   fsBtn.type = 'button';
   fsBtn.className = 'ts-fs';
@@ -400,9 +400,8 @@ async function createDeck(options = {}) {
   const toggleFullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.())?.catch?.(() => {});
   const syncFs = () => {
     const on = !!document.fullscreenElement;
-    fsBtn.innerHTML = on ? ICON_EXIT : ICON_ENTER;
+    fsBtn.innerHTML = `${on ? ICON_EXIT : ICON_ENTER}<span>${on ? 'Exit fullscreen' : 'Fullscreen'}</span><kbd>F</kbd>`;
     fsBtn.setAttribute('aria-label', on ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)');
-    fsBtn.dataset.label = on ? 'Exit fullscreen · F' : 'Fullscreen · F';
   };
   syncFs();
   fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
@@ -410,30 +409,39 @@ async function createDeck(options = {}) {
   // iOS Safari and some embeds don't allow fullscreen on a page: don't show a button that can't work
   if (document.fullscreenEnabled !== false && options.fullscreenButton !== false) chrome.appendChild(fsBtn);
 
-  // Bottom-edge hover reveals the dots (auto mode) and the fullscreen button.
-  let nearBottom = false, hideTimer = 0;
+  // Bottom-edge hover reveals the dots (auto mode); top-edge hover reveals the fullscreen button.
+  let nearBottom = false, nearTop = false, hideTimer = 0, topTimer = 0;
   const isLast = () => current === slides.length - 1;
   function syncDots() {
     const show = cfg.dots === 'always' || ((cfg.dots === 'auto' || cfg.dots === 'last') && isLast()) || (cfg.dots === 'auto' && nearBottom);
     dotsNav.classList.toggle('is-shown', show);
     // first slide: always offer fullscreen (that's when you want it) until you're in it; elsewhere hover-only
-    fsBtn.classList.toggle('is-shown', nearBottom || (current === 0 && !document.fullscreenElement));
+    fsBtn.classList.toggle('is-shown', nearTop || (current === 0 && !document.fullscreenElement));
   }
   const setNear = (v) => { if (v !== nearBottom) { nearBottom = v; syncDots(); } };
   window.addEventListener('pointermove', (e) => {
     const r = stage.getBoundingClientRect();
     const near = e.clientY > r.bottom - r.height * 0.16 && e.clientY < r.bottom + 40;
     if (near) { clearTimeout(hideTimer); setNear(true); }
-    else if (nearBottom && !dotsNav.matches(':hover') && !fsBtn.matches(':hover')) {
+    else if (nearBottom && !dotsNav.matches(':hover')) {
       clearTimeout(hideTimer);
       hideTimer = setTimeout(() => setNear(false), 2000);
     }
+    const top = e.clientY < r.top + r.height * 0.14 && e.clientY > r.top - 40;
+    if (top) { clearTimeout(topTimer); if (!nearTop) { nearTop = true; syncDots(); } }
+    else if (nearTop && !fsBtn.matches(':hover')) {
+      clearTimeout(topTimer);
+      topTimer = setTimeout(() => { nearTop = false; syncDots(); }, 2000);
+    }
   });
-  document.documentElement.addEventListener('pointerleave', () => { clearTimeout(hideTimer); hideTimer = setTimeout(() => setNear(false), 600); });
-  [dotsNav, fsBtn].forEach((el) => {
-    el.addEventListener('focusin', () => setNear(true));
-    el.addEventListener('focusout', () => setNear(false));
+  document.documentElement.addEventListener('pointerleave', () => {
+    clearTimeout(hideTimer); clearTimeout(topTimer);
+    hideTimer = setTimeout(() => { nearTop = false; setNear(false); syncDots(); }, 600);
   });
+  dotsNav.addEventListener('focusin', () => setNear(true));
+  dotsNav.addEventListener('focusout', () => setNear(false));
+  fsBtn.addEventListener('focusin', () => { nearTop = true; syncDots(); });
+  fsBtn.addEventListener('focusout', () => { nearTop = false; syncDots(); });
 
   function updateChrome() {
     const s = slides[current];
