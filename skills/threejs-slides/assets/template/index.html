@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="{{THEME}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <!-- === FONTS (swap per theme — see references/themes.md) === -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{{FONTS}}">
+  <!-- === RUNTIME === -->
+  <link rel="stylesheet" href="lib/threejs-slides.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+  } }
+  </script>
+  <style>
+    /* === DECK-SPECIFIC STYLES (optional) === */
+  </style>
+</head>
+<body>
+  <!--
+    One <section> = one slide. Key attributes:
+      class="layout-*"   title | center | split | split-reverse | bottom | top | statement | section | stats | cards
+      data-scene         galaxy | morph | globe | terrain | orbit | bars | network | knot | blob | tunnel | cubes | timeline | none
+      data-params        JSON options for the scene
+      data-step="n"      build steps on elements; data-scene-steps="n" for scene-only steps
+      data-anim          rise | fade | left | right | zoom | blur | letters  (default: children rise)
+      <aside class="notes"> speaker notes (press N)
+  -->
+  <main class="deck" data-journey="drift">
+
+    <section class="layout-title" data-scene="galaxy">
+      <span class="kicker">{{KICKER}}</span>
+      <h1 data-anim="letters">{{TITLE}}</h1>
+      <p class="lede" data-anim="rise">{{SUBTITLE}}</p>
+      <aside class="notes">Opening line goes here.</aside>
+    </section>
+
+    <section class="layout-split" data-scene="morph" data-params='{"shapes":["sphere","torus","helix"]}'>
+      <span class="kicker" data-anim="rise">Section</span>
+      <h2 data-anim="rise">A slide with build steps</h2>
+      <ul class="points">
+        <li data-step="1" data-anim="left">First point — the cloud becomes a torus</li>
+        <li data-step="2" data-anim="left">Second point — then a helix</li>
+      </ul>
+    </section>
+
+    <section class="layout-center" data-scene="network" data-offset="0,0,-4">
+      <h2>Thank you</h2>
+      <p class="lede">Questions?</p>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { createDeck } from './lib/threejs-slides.js';
+    // registerScene('my-scene', (ctx) => ({ object, update(t, dt, info) {} }));  — see references/custom-scenes.md
+    await createDeck();
+  </script>
+</body>
+</html>

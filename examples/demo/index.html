@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en" data-theme="nebula">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slides that fly — threejs-slides</title>
+  <meta name="description" content="A demo deck built with the threejs-slides Claude Code skill.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="lib/threejs-slides.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+  } }
+  </script>
+  <style>
+    /* === DECK-SPECIFIC === */
+    .install { font-family: var(--font-mono); font-size: 30px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px 34px; margin-top: 46px; backdrop-filter: blur(12px); }
+    .install span { color: var(--accent); }
+    .closing .small { margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <main class="deck" data-journey="drift">
+
+    <!-- 1 · Title -->
+    <section class="layout-title" data-scene="galaxy">
+      <span class="kicker" data-anim="fade">threejs-slides · a Claude Code skill</span>
+      <h1 data-anim="letters">Slides that fly.</h1>
+      <p class="lede" data-anim="rise" data-delay="900">Animated 3D presentations written as plain HTML and rendered live with Three.js.</p>
+      <aside class="notes">Open on the galaxy. Let it turn for a second before speaking. Then: "Every slide you'll see is a place in one 3D world."</aside>
+    </section>
+
+    <!-- 2 · Morph with build steps -->
+    <section class="layout-split" data-scene="morph" data-params='{"shapes":["sphere","torus","helix","cube"]}'>
+      <span class="kicker">Build steps</span>
+      <h2>One cloud. Every shape it needs.</h2>
+      <ul class="points">
+        <li data-step="1" data-anim="left">Press → and seven thousand particles become a torus</li>
+        <li data-step="2" data-anim="left">Again, and they braid into a helix</li>
+        <li data-step="3" data-anim="left">The scene follows the story, one beat at a time</li>
+      </ul>
+      <aside class="notes">Three presses. Each press reveals a bullet and morphs the cloud.</aside>
+    </section>
+
+    <!-- 3 · Stats over terrain -->
+    <section class="layout-stats layout-top" data-scene="terrain">
+      <span class="kicker">What's in the box</span>
+      <h2>Everything a talk needs</h2>
+      <div class="stats">
+        <div class="stat"><div class="value" data-count="12">12</div><div class="label">3D scenes ready to use</div></div>
+        <div class="stat"><div class="value" data-count="10">10</div><div class="label">Slide layouts</div></div>
+        <div class="stat"><div class="value" data-count="5">5</div><div class="label">Themes that colour the 3D too</div></div>
+        <div class="stat"><div class="value" data-count="0">0</div><div class="label">Build steps or npm installs</div></div>
+      </div>
+    </section>
+
+    <!-- 4 · Code -->
+    <section class="layout-split" data-scene="knot">
+      <span class="kicker">Authoring</span>
+      <h2>Write HTML. Present a film.</h2>
+      <pre class="code" data-anim="rise"><span class="c">&lt;!-- one section = one slide --&gt;</span>
+&lt;section class=<span class="s">"layout-split"</span>
+         data-scene=<span class="s">"knot"</span>&gt;
+  &lt;h2&gt;Write HTML.&lt;/h2&gt;
+  &lt;aside class=<span class="s">"notes"</span>&gt;…&lt;/aside&gt;
+&lt;/section&gt;</pre>
+    </section>
+
+    <!-- 5 · Section divider -->
+    <section class="layout-section" data-scene="tunnel">
+      <span class="num">01</span>
+      <h2 data-anim="zoom">How it works</h2>
+    </section>
+
+    <!-- 6 · Cards over network -->
+    <section class="layout-cards" data-scene="network" data-offset="0,0,-3">
+      <span class="kicker">Architecture</span>
+      <h2>Three layers, one world</h2>
+      <div class="cards">
+        <div class="card"><span class="icon">stage</span><h3>HTML on top</h3><p>A fixed 1920×1080 stage that scales to any screen without reflowing.</p></div>
+        <div class="card"><span class="icon">scene</span><h3>3D behind</h3><p>Each slide owns a scene, coloured from the theme's CSS variables.</p></div>
+        <div class="card"><span class="icon">journey</span><h3>Camera between</h3><p>Changing slides flies the camera along a path through space.</p></div>
+      </div>
+    </section>
+
+    <!-- 7 · Orbit with highlight steps -->
+    <section class="layout-split-reverse" data-scene="orbit" data-scene-steps="5"
+             data-params='{"items":["drift","line","dive","spiral","still"],"center":"path"}'>
+      <span class="kicker">Journeys</span>
+      <h2>Every slide is a place.</h2>
+      <p class="lede">Pick how the camera travels: drift through space, track sideways, dive down, spiral, or stay still and cross-fade.</p>
+      <aside class="notes">Five presses step through the five journey types on the ring.</aside>
+    </section>
+
+    <!-- 8 · Bars -->
+    <section class="layout-bottom" data-scene="bars"
+             data-params='{"data":[{"label":"Scenes","value":12,"highlight":true},{"label":"Layouts","value":10},{"label":"Animations","value":7},{"label":"Themes","value":5},{"label":"Journeys","value":5}]}'>
+      <span class="kicker">Data</span>
+      <h2>Charts that grow into place</h2>
+      <p class="small">The bars scene reads its numbers from a JSON attribute on the slide.</p>
+    </section>
+
+    <!-- 9 · Globe -->
+    <section class="layout-split" data-scene="globe" data-params='{"arcCount":12}'>
+      <span class="kicker">Sharing</span>
+      <h2>Static files. Host them anywhere.</h2>
+      <ul class="points">
+        <li>GitHub Pages, Netlify, Vercel, S3: any static host works</li>
+        <li>Export a single self-contained HTML file to send around</li>
+        <li>PDF export, one page per slide, for the pre-read</li>
+      </ul>
+    </section>
+
+    <!-- 10 · Statement -->
+    <section class="layout-statement" data-scene="cubes" data-offset="3,-2.4,0" data-scale="0.72">
+      <blockquote data-anim="blur">Motion should carry meaning, not decorate it.</blockquote>
+      <cite data-anim="fade" data-delay="700">The skill's design rule for every scene</cite>
+    </section>
+
+    <!-- 11 · Timeline -->
+    <section class="layout-top" data-scene="timeline" data-scene-steps="6" data-offset="0,-0.9,0"
+             data-params='{"items":[{"label":"Brief","sub":"audience & goal"},{"label":"Storyboard","sub":"scene per beat"},{"label":"Scaffold","sub":"new-deck.sh"},{"label":"Author","sub":"HTML slides"},{"label":"QA","sub":"screenshots"},{"label":"Ship","sub":"host or PDF"}],"start":1}'>
+      <span class="kicker">Workflow</span>
+      <h2>How Claude builds your deck</h2>
+    </section>
+
+    <!-- 12 · Blob -->
+    <section class="layout-split-reverse" data-scene="blob">
+      <span class="kicker">Respectful by default</span>
+      <h2>Calm when it should be.</h2>
+      <ul class="points">
+        <li>Honours reduced-motion settings</li>
+        <li>Keyboard, click, swipe and wheel navigation</li>
+        <li>Speaker notes on N, deep links like #/7</li>
+      </ul>
+    </section>
+
+    <!-- 13 · Install -->
+    <section class="layout-title closing" data-scene="galaxy" data-params='{"arms":3,"tilt":0.9,"seed":21}'>
+      <span class="kicker">Get the skill</span>
+      <h2>Make your next talk move.</h2>
+      <div class="install"><span>/plugin</span> marketplace add Parag08/threejs-slides</div>
+      <p class="small">github.com/Parag08/threejs-slides</p>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { createDeck } from './lib/threejs-slides.js';
+    await createDeck();
+  </script>
+</body>
+</html>

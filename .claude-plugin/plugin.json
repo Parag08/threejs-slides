@@ -1,0 +1,10 @@
+{
+  "name": "threejs-slides",
+  "description": "Build animated, cinematic 3D presentations in HTML with Three.js: camera journeys between slides, particle morphs, globes, 3D charts and build steps.",
+  "version": "1.0.0",
+  "author": { "name": "Parag08", "url": "https://github.com/Parag08" },
+  "homepage": "https://github.com/Parag08/threejs-slides",
+  "repository": "https://github.com/Parag08/threejs-slides",
+  "license": "MIT",
+  "keywords": ["presentations", "slides", "threejs", "webgl", "3d", "animation", "deck", "keynote"]
+}

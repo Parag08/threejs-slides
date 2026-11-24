@@ -1,0 +1,148 @@
+# Authoring reference
+
+## Deck skeleton
+
+```html
+<!doctype html>
+<html lang="en" data-theme="nebula">              <!-- theme -->
+<head>
+  <link rel="stylesheet" href="FONT_URL_FOR_THEME">  <!-- see Themes below -->
+  <link rel="stylesheet" href="lib/threejs-slides.css">
+  <script type="importmap">{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/" } }</script>
+  <style>/* deck-specific CSS */</style>
+</head>
+<body>
+  <main class="deck" data-journey="drift" data-bloom="0.4" data-ambient="stars" data-transition="1">
+    <section …>…</section>
+  </main>
+  <script type="module">
+    import { createDeck, registerScene } from './lib/threejs-slides.js';
+    await createDeck();
+  </script>
+</body>
+</html>
+```
+
+### `.deck` options
+
+| Attribute | Values | Default |
+|---|---|---|
+| `data-journey` | `drift` · `line` · `dive` · `spiral` · `still` | `drift` |
+| `data-bloom` | 0 to 1.5 glow strength (0 turns it off) | 0.4 dark themes, 0 light themes |
+| `data-ambient` | `stars` · `dust` · `none` | `stars` |
+| `data-transition` | duration multiplier (0.6 is snappier, 1.4 is more cinematic) | 1 |
+
+These can also be passed to `createDeck({ journey, bloom, ambient, transition, parallax, chrome, clickToAdvance })`.
+
+URL flags: `?static` (no motion: for screenshots and reduced motion), `?nochrome` (hides the progress bar and counter), `?quality=low` (DPR 1, no bloom), `?slide=4` or `#/4` (start slide).
+
+## Layouts
+
+Add one class to each `<section>`. All sizes are designed at 1920×1080.
+
+| Class | Use | Structure |
+|---|---|---|
+| `layout-title` | opening / closing | `.kicker`, `h1` (or `h2`), `.lede`, centred |
+| `layout-center` | single idea, centred | `h2`, `.lede` |
+| `layout-split` | text left, 3D right | `.kicker`, `h2`, `.lede` or `ul.points` or `pre.code` |
+| `layout-split-reverse` | 3D left, text right | same |
+| `layout-bottom` | 3D above, headline below | `.kicker`, `h2`, `.small` |
+| `layout-top` | headline at top, 3D below | `.kicker`, `h2` |
+| `layout-statement` | quote / principle | `blockquote`, `cite` |
+| `layout-section` | act divider | `.num`, `h2` |
+| `layout-stats` | 2–4 big numbers | `h2`, `.stats > .stat > .value + .label` |
+| `layout-cards` | 2–4 parallel ideas | `h2`, `.cards > .card > .icon + h3 + p` |
+
+Classes can be combined, e.g. `class="layout-stats layout-top"`.
+
+Text elements: `.kicker` (mono eyebrow with a rule), `h1` 148px, `h2` 96px, `h3` 46px, `.lede` 40px, `p`/`li` 32px, `.small` 24px, `ul.points`, `pre.code` (use `<span class="c|k|s">` for comment/keyword/string colours), `.chips > .chip`, `.accent`, `.muted`.
+
+Legibility helpers: `scrim-left` / `scrim-right` on a section add a soft gradient behind the text side.
+
+### Density limits (per slide)
+- headline: 9 words or fewer
+- `ul.points`: 3 items or fewer, each fitting on 2 lines
+- `.cards`: 4 or fewer, body text 20 words or fewer each
+- `.stats`: 4 or fewer
+- `pre.code`: 8 lines or fewer
+
+Past these limits, split into two slides.
+
+## Entrance animations
+
+`data-anim` on any element inside a slide:
+
+| Value | Effect |
+|---|---|
+| `rise` | fade up (default) |
+| `fade` | fade only |
+| `left` / `right` | slide in from the side |
+| `zoom` | scale up |
+| `blur` | blur → sharp (good for statements) |
+| `letters` | split into letters that cascade in (headlines only; plain text, no inner tags) |
+
+- Without any `data-anim` on a slide, **its direct children rise in automatically**, staggered by 110ms. Set `data-anim="none"` on the section to disable this.
+- `data-delay="ms"` overrides the stagger for one element.
+- Elements animate in once the camera is about 40% of the way to the slide.
+
+Counters: `<span data-count="98.6" data-suffix="%" data-prefix="$">98.6%</span>` counts up when the slide appears (`data-duration` in ms). Put the final value in the text as a fallback.
+
+## Build steps
+
+- `data-step="1"`, `data-step="2"`, …: hidden until the presenter presses next. Elements with the same number appear together.
+- Each press also calls the scene's `step(k)` (morph changes shape, orbit highlights, timeline advances).
+- `data-scene-steps="n"` on the section adds steps that only drive the scene.
+- Going back to a slide shows all of its steps.
+
+## Speaker notes
+
+```html
+<aside class="notes">What to say. <b>HTML</b> allowed.</aside>
+```
+The presenter presses **N** to show them over the slide. Notes never show in screenshots unless toggled.
+
+## Navigation (built in)
+
+→ ↓ Space PageDown Enter: next · ← ↑ PageUp Backspace: back · Home/End · click (left 20% goes back) · swipe · mouse wheel · F fullscreen · N notes · ? help · URL hash `#/n`.
+
+JS API: `window.deck` → `{ index, count, step, slides, go(i, {instant, allSteps}), next(), prev(), ready, on('change', fn), renderer, scene, camera, palette }`.
+
+## Themes
+
+Set `data-theme` on `<html>` **and** load that theme's fonts:
+
+| Theme | Font stylesheet URL |
+|---|---|
+| nebula | `https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap` |
+| ember | `https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Figtree:wght@400..700&family=IBM+Plex+Mono:wght@400;600&display=swap` |
+| aurora | `https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400..700&family=Space+Mono:wght@400;700&display=swap` |
+| paper | `https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..600&family=Public+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;600&display=swap` |
+| mono | `https://fonts.googleapis.com/css2?family=Archivo:wght@400..800&family=JetBrains+Mono:wght@400;600&display=swap` |
+
+### Custom brand theme
+
+Override the variables in the deck's `<style>`. The 3D scenes read them at startup:
+
+```css
+:root[data-theme="brand"] {
+  --bg: #0b1020; --fg: #f5f7ff; --muted: #8e97b5;
+  --accent: #ffcc00; --accent-2: #ff5f5f; --accent-3: #48c9ff;
+  --panel: rgba(20, 26, 48, .55); --line: rgba(245, 247, 255, .14);
+  --font-display: "Your Display", sans-serif; --font-body: "Your Body", sans-serif; --font-mono: "JetBrains Mono", monospace;
+  --display-weight: 700; --display-tracking: -0.03em;
+}
+```
+Rules: `--bg` sets the clear colour and fog. Backgrounds with lightness above 55% switch the scenes to light mode (normal blending, no bloom). `--accent` is the dominant 3D colour, `--accent-2` the highlight, `--accent-3` the support colour. Keep contrast between `--fg` and `--bg` at 7:1 or more.
+
+## Images and media
+
+Plain HTML works: `<img src="assets/photo.jpg" style="width:720px;border-radius:24px">`. Keep files next to `index.html` with relative paths. `bundle.mjs` inlines them. For an image *in 3D* (a floating screenshot), write a custom scene (see custom-scenes.md, "image plane").
+
+## Common mistakes
+- Invalid JSON in `data-params` (trailing commas, single quotes inside): the console warns and the scene uses defaults.
+- Opening `index.html` from `file://`: modules are blocked. Serve it over HTTP, or use `bundle.mjs`.
+- Using `display:none` to hide slide content: use build steps instead.
+- Long headlines with `data-anim="letters"`: keep them to 5 words or fewer, otherwise the cascade drags.
+- More than 7 items in orbit/timeline/bars: labels collide. Split the slide.

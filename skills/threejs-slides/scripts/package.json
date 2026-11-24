@@ -1,0 +1,13 @@
+{
+  "name": "threejs-slides-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Optional QA tooling for the threejs-slides skill (screenshots, layout checks, PDF export).",
+  "scripts": {
+    "qa": "node qa.mjs",
+    "bundle": "node bundle.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.65.1"
+  }
+}
