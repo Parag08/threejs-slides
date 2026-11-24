@@ -33,6 +33,18 @@ Restart Claude Code if it asks. The skill is then available as `/threejs-slides:
 
 > Use the full HTTPS URL. The short `Parag08/threejs-slides` form can make Claude Code try SSH, which fails when GitHub isn't in your `known_hosts`.
 
+**In the Claude desktop app** (or anywhere `/plugin` opens a dialog that doesn't let you finish), run the same two steps in a terminal instead:
+
+```bash
+claude plugin marketplace add https://github.com/Parag08/threejs-slides
+```
+
+```bash
+claude plugin install threejs-slides@threejs-slides
+```
+
+Then start a new session: skills load when a session starts.
+
 ### Option 2: skills CLI
 
 ```bash
