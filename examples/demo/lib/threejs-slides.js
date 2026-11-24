@@ -249,6 +249,7 @@ async function createDeck(options = {}) {
       offset: parseVec(el.dataset.offset) || layoutOffset(el),
       scale: Number(el.dataset.scale || 1),
       dim: el.dataset.dim != null ? Number(el.dataset.dim) : layoutDim(el),
+      brightness: el.dataset.brightness != null ? Number(el.dataset.brightness) : 1,
       notes: notesEl ? notesEl.innerHTML : (el.dataset.notes || ''),
       vis: 0, visFrom: 0, visTo: 0, group: null, inst: null, mats: [],
     };
@@ -273,6 +274,19 @@ async function createDeck(options = {}) {
     group.add(inst.object);
     group.visible = false;
     scene.add(group);
+    // data-brightness: darken/brighten the object's colours (not its opacity). Labels (sprites) are left alone.
+    if (s.brightness !== 1) {
+      const seen = new Set();
+      group.traverse((o) => {
+        if (o.isSprite) return;
+        (Array.isArray(o.material) ? o.material : o.material ? [o.material] : []).forEach((m) => {
+          if (seen.has(m)) return; seen.add(m);
+          m.color?.multiplyScalar(s.brightness);
+          if (m.emissiveIntensity != null) m.emissiveIntensity *= s.brightness;
+          if (m.uniforms?.uBrightness) m.uniforms.uBrightness.value *= s.brightness;
+        });
+      });
+    }
     const managed = new Set(inst.fadeManaged || []);
     const mats = [];
     group.traverse((o) => {

@@ -133,11 +133,18 @@ function makeLabel(ctx, text, { height = 0.32, color, font = 'body', weight = 60
   const c = document.createElement('canvas');
   const g = c.getContext('2d');
   g.font = `${weight} ${px}px ${fam}`;
-  const w = Math.ceil(g.measureText(String(text)).width) + px * 0.6;
-  c.width = w; c.height = Math.ceil(px * 1.4);
+  const w = Math.ceil(g.measureText(String(text)).width) + px * 0.9;
+  c.width = w; c.height = Math.ceil(px * 1.6);
   g.font = `${weight} ${px}px ${fam}`;
   g.textBaseline = 'middle';
   g.textAlign = 'center';
+  // halo in the background colour (same idea as the HTML text halo) so labels read over glowing objects
+  const halo = '#' + ctx.palette.bg.getHexString(THREE.SRGBColorSpace);
+  g.lineJoin = 'round';
+  g.strokeStyle = halo; g.lineWidth = px * 0.14;
+  g.shadowColor = halo; g.shadowBlur = px * 0.35;
+  g.strokeText(String(text), w / 2, c.height / 2);
+  g.shadowBlur = 0;
   g.fillStyle = '#' + (color || ctx.palette.fg).getHexString(THREE.SRGBColorSpace);
   g.fillText(String(text), w / 2, c.height / 2);
   const tex = new THREE.CanvasTexture(c);
@@ -146,7 +153,7 @@ function makeLabel(ctx, text, { height = 0.32, color, font = 'body', weight = 60
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
   const s = new THREE.Sprite(mat);
   const aspect = c.width / c.height;
-  s.scale.set(height * 1.4 * aspect, height * 1.4, 1);
+  s.scale.set(height * 1.6 * aspect, height * 1.6, 1);
   if (align === 'left') s.center.set(0.08, 0.5);
   if (align === 'right') s.center.set(0.92, 0.5);
   s.renderOrder = 10;
@@ -457,12 +464,13 @@ scenes.orbit = (ctx) => {
   const items = params.items ?? ['One', 'Two', 'Three', 'Four', 'Five'];
   const g = new THREE.Group();
   const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.7, 4), new THREE.MeshStandardMaterial({
-    color: palette.accent, emissive: palette.accent, emissiveIntensity: palette.isLight ? 0.1 : 0.25, roughness: 0.35, metalness: 0.2,
+    color: palette.accent.clone().multiplyScalar(0.6), emissive: palette.accent, emissiveIntensity: palette.isLight ? 0.08 : 0.13, roughness: 0.35, metalness: 0.2,
   }));
   g.add(core);
-  if (params.center) { const l = makeLabel(ctx, params.center, { height: 0.26, font: 'display', color: palette.bg }); l.position.set(0, 0, 0.95); g.add(l); }
-  const tilt = new THREE.Group(); tilt.rotation.x = 0.42; tilt.rotation.z = -0.12; g.add(tilt);
   const R = params.radius ?? 2.15;
+  // centre label sits above the whole diagram, on dark background, where no satellite ever passes
+  if (params.center) { const l = makeLabel(ctx, params.center, { height: 0.34, font: 'display', weight: 700 }); l.position.set(0, 2.05, 0); g.add(l); }
+  const tilt = new THREE.Group(); tilt.rotation.x = 0.42; tilt.rotation.z = -0.12; g.add(tilt);
   const ringPts = new THREE.EllipseCurve(0, 0, R, R).getPoints(160).map((p) => new THREE.Vector3(p.x, 0, p.y));
   const ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(ringPts),
     new THREE.LineBasicMaterial({ color: palette.fg, transparent: true, opacity: 0.25 }));
@@ -470,7 +478,7 @@ scenes.orbit = (ctx) => {
   const sats = items.map((name, i) => {
     const holder = new THREE.Group();
     const col = paletteColor(palette, i);
-    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 24), new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: palette.isLight ? 0.1 : 0.3, roughness: 0.4 }));
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 24), new THREE.MeshStandardMaterial({ color: col.clone().multiplyScalar(0.7), emissive: col, emissiveIntensity: palette.isLight ? 0.08 : 0.2, roughness: 0.4 }));
     const label = makeLabel(ctx, name, { height: 0.24 });
     label.position.y = 0.48;
     holder.add(ball, label);
@@ -514,7 +522,7 @@ scenes.bars = (ctx) => {
   const unit = params.unit ?? '';
   const bars = data.map((d, i) => {
     const col = d.highlight ? palette.accent2.clone() : palette.accent.clone().lerp(palette.accent3, i / Math.max(1, data.length - 1) * 0.6);
-    const mat = new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: palette.isLight ? 0.02 : 0.1, roughness: 0.35, metalness: 0.2 });
+    const mat = new THREE.MeshStandardMaterial({ color: col.clone().multiplyScalar(0.88), emissive: col, emissiveIntensity: palette.isLight ? 0.016 : 0.088, roughness: 0.35, metalness: 0.2 });
     const geo = new THREE.BoxGeometry(0.62, 1, 0.62); geo.translate(0, 0.5, 0);
     const m = new THREE.Mesh(geo, mat);
     m.position.x = i * gap - width / 2;
