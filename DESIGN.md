@@ -21,8 +21,9 @@ The source of truth for how decks made with this skill look and move. Update it 
 | Token | nebula | ember | aurora | paper | mono |
 |---|---|---|---|---|---|
 | `--bg` | #05070d | #0f0a08 | #03110e | #f3eee4 | #0a0a0a |
-| `--fg` | #e9edf5 | #f7ede3 | #e4fff5 | #1c1a16 | #f4f4f1 |
-| `--muted` | #8b95a9 | #a8958a | #84a99c | #6f685c | #8d8d88 |
+| `--fg` | #f2f5fa | #fbf3ea | #effff8 | #15130f | #f7f7f4 |
+| `--text-2` | #ccd4e2 | #eadccd | #c3ebdc | #34302a | #d6d6d2 |
+| `--muted` | #aab3c5 | #c4b2a5 | #a3c9bb | #57514a | #aeaea9 |
 | `--accent` | #5cf2d6 | #ff8a3d | #3dffa8 | #2046d8 | #f4f4f1 |
 | `--accent-2` | #ff7a59 | #ffd166 | #2bd9ff | #e0442b | #ff4b33 |
 | `--accent-3` | #7aa2ff | #e6394a | #f7e86b | #0f8a6a | #9a9a95 |
@@ -68,3 +69,12 @@ Light mode (background lightness above 55%): normal blending instead of additive
 ## Layouts
 
 title · center · split (3D x+3.3) · split-reverse (3D x−3.3) · bottom (3D y+0.5) · top (3D y−1.1) · statement · section · stats · cards. The offsets live in `layoutOffset()` in the engine.
+
+## Legibility
+
+No text colour can contrast with both a dark background and bright particles (white on the aqua galaxy measures 1.2:1). So text always gets a dark (or light, on paper) patch behind it:
+
+- **Text roles:** `--fg` headlines/body (16–18.6:1 on bg), `--text-2` secondary (11–15:1), `--muted` captions (6.8–10.7:1). Kicker = 35% accent + 65% fg; the accent stays on its rule line. No transparency in text colours.
+- **Halo:** `text-shadow: 0 0 2px, 0 0 8px, 0 2px 26px` in bg at 92%.
+- **Scrim:** `.slide::before` gradient in bg at `--scrim` (78%; 86% on title/center/statement/section), shaped per layout.
+- **3D dim by layout:** split 1.0 · top/bottom/stats 0.7 · title/center/statement/section/cards 0.42. Override with `data-dim`.

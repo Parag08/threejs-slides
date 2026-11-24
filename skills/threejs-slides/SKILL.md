@@ -24,7 +24,7 @@ my-deck/
 1. **Motion carries meaning.** Every 3D scene and every build step must say something the words alone don't. If a scene is only decoration, use a quieter one (`none`, `network`, `galaxy`) or none at all.
 2. **One idea per slide.** Speaker decks: a headline plus at most 3 short points. If content overflows, split the slide. Never shrink the text.
 3. **Fixed 1920×1080 stage.** The runtime scales the whole stage to fit. Don't add media queries that reflow slides, and size everything in px at 1920×1080.
-4. **Text and 3D never fight.** Use layouts that keep them apart (`layout-split` puts 3D on the right, `layout-split-reverse` on the left, `layout-bottom` puts it above the text). In `layout-center` / `layout-title`, pick a scene that reads as background.
+4. **Text and 3D never fight.** The 3D reads best *beside* the text. Use layouts that keep them apart (`layout-split` puts 3D on the right, `layout-split-reverse` on the left, `layout-bottom` puts it above the text). In `layout-center` / `layout-title`, pick a scene that reads as background. The runtime adds text halos and scrims and dims 3D that sits behind text (`data-dim` overrides). Never set running text in `--accent` over a scene.
 5. **Vary the rhythm.** Never use the same scene on two consecutive slides. Put a `layout-section` + `tunnel` slide between acts. Bookending a deck with the same scene (title and closing) is fine.
 6. **Verify visually.** Don't hand over a deck you haven't screenshotted slide by slide (Phase 5).
 

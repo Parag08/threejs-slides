@@ -64,6 +64,15 @@ function layoutOffset(el) {
   return [0, 0, 0];
 }
 
+/** How bright the 3D is on each layout: full when it sits beside the text, dimmed when it sits behind it. */
+function layoutDim(el) {
+  const c = el.classList;
+  if (c.contains('layout-split') || c.contains('layout-split-reverse')) return 1;
+  if (c.contains('layout-bottom') || c.contains('layout-top') || c.contains('layout-stats')) return 0.7;
+  if (['layout-title', 'layout-center', 'layout-statement', 'layout-section', 'layout-cards'].some((k) => c.contains(k))) return 0.42;
+  return 1;
+}
+
 function readPalette(root) {
   const cs = getComputedStyle(root);
   const v = (name, fb) => cs.getPropertyValue(name).trim() || fb;
@@ -239,6 +248,7 @@ async function createDeck(options = {}) {
       anchor: journeyFn(index),
       offset: parseVec(el.dataset.offset) || layoutOffset(el),
       scale: Number(el.dataset.scale || 1),
+      dim: el.dataset.dim != null ? Number(el.dataset.dim) : layoutDim(el),
       notes: notesEl ? notesEl.innerHTML : (el.dataset.notes || ''),
       vis: 0, visFrom: 0, visTo: 0, group: null, inst: null, mats: [],
     };
@@ -496,11 +506,12 @@ async function createDeck(options = {}) {
       const visible = s.vis > 0.002;
       s.group.visible = visible;
       if (!visible) continue;
+      const f = s.vis * s.dim;
       for (const m of s.mats) {
-        if (m.kind === 'uniform') m.m.uniforms.uFade.value = s.vis;
-        else m.m.opacity = m.base * s.vis;
+        if (m.kind === 'uniform') m.m.uniforms.uFade.value = f;
+        else m.m.opacity = m.base * f;
       }
-      s.inst.update?.(t, dt, { fade: s.vis, active: s.index === current, motion });
+      s.inst.update?.(t, dt, { fade: f, active: s.index === current, motion });
     }
     pointerSmooth.lerp(pointer, Math.min(1, dt * 3));
     camera.position.copy(camPos).add(new THREE.Vector3(pointerSmooth.x * 0.5, -pointerSmooth.y * 0.35, 0));

@@ -59,7 +59,7 @@ Classes can be combined, e.g. `class="layout-stats layout-top"`.
 
 Text elements: `.kicker` (mono eyebrow with a rule), `h1` 148px, `h2` 96px, `h3` 46px, `.lede` 40px, `p`/`li` 32px, `.small` 24px, `ul.points`, `pre.code` (use `<span class="c|k|s">` for comment/keyword/string colours), `.chips > .chip`, `.accent`, `.muted`.
 
-Legibility helpers: `scrim-left` / `scrim-right` on a section add a soft gradient behind the text side.
+Legibility (built in): no text colour can contrast with both a dark background and bright particles, so every slide gets (1) a background-coloured halo around each glyph and (2) a soft gradient scrim behind its text area, shaped per layout. When the 3D sits *behind* the text (title, center, statement, section, cards), the engine also dims it to 42%. Controls: `style="--scrim: 60%"` on a section for a lighter scrim, `class="no-scrim"` to remove it, `data-dim="1"` for full-strength 3D. Text colours: `--fg` for headlines and body, `--text-2` for secondary text (lede, card text, stat labels), `--muted` for captions only. Don't use `--accent` for running text over 3D; the kicker is a pale accent tint for that reason. `scrim-left` / `scrim-right` add an extra side gradient.
 
 ### Density limits (per slide)
 - headline: 9 words or fewer
@@ -127,14 +127,14 @@ Override the variables in the deck's `<style>`. The 3D scenes read them at start
 
 ```css
 :root[data-theme="brand"] {
-  --bg: #0b1020; --fg: #f5f7ff; --muted: #8e97b5;
+  --bg: #0b1020; --fg: #f5f7ff; --text-2: #cfd5ea; --muted: #a9b1cc;
   --accent: #ffcc00; --accent-2: #ff5f5f; --accent-3: #48c9ff;
   --panel: rgba(20, 26, 48, .55); --line: rgba(245, 247, 255, .14);
   --font-display: "Your Display", sans-serif; --font-body: "Your Body", sans-serif; --font-mono: "JetBrains Mono", monospace;
   --display-weight: 700; --display-tracking: -0.03em;
 }
 ```
-Rules: `--bg` sets the clear colour and fog. Backgrounds with lightness above 55% switch the scenes to light mode (normal blending, no bloom). `--accent` is the dominant 3D colour, `--accent-2` the highlight, `--accent-3` the support colour. Keep contrast between `--fg` and `--bg` at 7:1 or more.
+Rules: `--bg` sets the clear colour and fog. Backgrounds with lightness above 55% switch the scenes to light mode (normal blending, no bloom). `--accent` is the dominant 3D colour, `--accent-2` the highlight, `--accent-3` the support colour. Keep `--fg` and `--text-2` at 7:1 or more against `--bg`, and `--muted` at 4.5:1 or more.
 
 ## Images and media
 

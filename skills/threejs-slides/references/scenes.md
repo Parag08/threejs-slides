@@ -12,6 +12,7 @@ Every scene accepts these slide attributes (handled by the engine, not the scene
 | `data-rotate="x,y,z"` | rotate the object, in degrees | `data-rotate="0,30,0"` |
 | `data-camera="x,y,z"` | camera position relative to the slide anchor (overrides the scene default) | `data-camera="0,2,10"` |
 | `data-look="x,y,z"` | camera look-at point relative to the anchor | `data-look="0,0.5,0"` |
+| `data-dim="0..1"` | 3D brightness on this slide. Default by layout: 1 for split layouts, 0.7 for top/bottom/stats, 0.42 when the 3D sits behind text (title, center, statement, section, cards) | `data-dim="0.6"` |
 | `data-scene-steps="n"` | number of build steps for the scene when there are fewer `data-step` elements | `data-scene-steps="5"` |
 
 Layouts set a default offset: `layout-split` → object at x = +3.3 (right), `layout-split-reverse` → x = −3.3 (left), `layout-bottom` → y = +0.5, `layout-top` → y = −1.1.
