@@ -78,3 +78,9 @@ No text colour can contrast with both a dark background and bright particles (wh
 - **Halo:** `text-shadow: 0 0 2px, 0 0 8px, 0 2px 26px` in bg at 92%.
 - **Scrim:** `.slide::before` gradient in bg at `--scrim` (78%; 86% on title/center/statement/section), shaped per layout.
 - **3D dim by layout:** split 1.0 · top/bottom/stats 0.7 · title/center/statement/section/cards 0.42. Override with `data-dim`.
+
+## Slide dots
+
+- One 12px dot per slide in a frosted pill at bottom centre (28px from the edge); the current slide is a 40px accent pill. Hit area is 34px.
+- Tooltip on hover/focus: `n · headline`, body font 22px, on a 92% bg panel.
+- Visibility (`data-dots="auto"`): always on the last slide; elsewhere it shows when the pointer is in the bottom 16% of the stage and hides 2s after it leaves. Fades and slides up over 0.35–0.45s.

@@ -161,6 +161,7 @@ async function createDeck(options = {}) {
     chrome: !qs.has('nochrome') && options.chrome !== false,
     quality: qs.get('quality') || options.quality || 'high',
     clickToAdvance: options.clickToAdvance ?? true,
+    dots: deckEl.dataset.dots || options.dots || 'auto', // auto = last slide + bottom hover · always · last · none
   };
   const motion = reducedMotion ? 0.15 : 1;
   if (reducedMotion) root.classList.add('ts-reduced');
@@ -369,8 +370,51 @@ async function createDeck(options = {}) {
     s.inst.step?.(s.step);
   }
 
+  /* --- Slide dots: one per slide, click to jump. 'auto' shows them on the last slide,
+         and on other slides only while the pointer is near the bottom edge. --- */
+  const dotsNav = document.createElement('nav');
+  dotsNav.className = 'ts-dots';
+  dotsNav.setAttribute('aria-label', 'Slides');
+  const titleOf = (el, i) => {
+    const t = el.dataset.title || el.querySelector('h1, h2, blockquote, h3')?.getAttribute('aria-label')
+      || el.querySelector('h1, h2, blockquote, h3')?.textContent || '';
+    return `${i + 1} · ${t.replace(/\s+/g, ' ').trim().slice(0, 60) || 'Slide'}`;
+  };
+  const dotEls = slides.map((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ts-dot';
+    b.dataset.label = titleOf(s.el, i);
+    b.setAttribute('aria-label', `Go to slide ${b.dataset.label}`);
+    b.addEventListener('click', (e) => { e.stopPropagation(); if (i !== current) go(i, { allSteps: i < current }); });
+    dotsNav.appendChild(b);
+    return b;
+  });
+  if (cfg.dots !== 'none') chrome.appendChild(dotsNav);
+  let dotsHover = false, dotsTimer = 0;
+  const isLast = () => current === slides.length - 1;
+  function syncDots() {
+    const show = cfg.dots === 'always' || ((cfg.dots === 'auto' || cfg.dots === 'last') && isLast()) || (cfg.dots === 'auto' && dotsHover);
+    dotsNav.classList.toggle('is-shown', show);
+  }
+  if (cfg.dots === 'auto') {
+    window.addEventListener('pointermove', (e) => {
+      const r = stage.getBoundingClientRect();
+      const near = e.clientY > r.bottom - r.height * 0.16 && e.clientY < r.bottom + 40;
+      if (near) { clearTimeout(dotsTimer); if (!dotsHover) { dotsHover = true; syncDots(); } }
+      else if (dotsHover && !dotsNav.matches(':hover')) {
+        clearTimeout(dotsTimer);
+        dotsTimer = setTimeout(() => { dotsHover = false; syncDots(); }, 2000);
+      }
+    });
+    dotsNav.addEventListener('focusin', () => { dotsHover = true; syncDots(); });
+    dotsNav.addEventListener('focusout', () => { dotsHover = false; syncDots(); });
+  }
+
   function updateChrome() {
     const s = slides[current];
+    dotEls.forEach((d, i) => { d.classList.toggle('is-current', i === current); d.toggleAttribute('aria-current', i === current); });
+    syncDots();
     progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
     counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     notesBody.innerHTML = s.notes || '<em>No notes for this slide.</em>';

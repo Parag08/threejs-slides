@@ -206,6 +206,22 @@ body.ts-body .slide { text-shadow: 0 0 2px var(--halo), 0 0 8px var(--halo), 0 2
 .ts-counter { position: absolute; right: 56px; bottom: 34px; font-size: 20px; color: var(--muted); letter-spacing: 0.08em; }
 .ts-notes { position: absolute; left: 56px; bottom: 70px; width: 760px; max-height: 420px; overflow: auto; pointer-events: auto; background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--line); border-radius: 18px; padding: 26px 30px; font-family: var(--font-body); font-size: 24px; line-height: 1.45; backdrop-filter: blur(12px); }
 .ts-notes-title { font-family: var(--font-mono); font-size: 18px; color: var(--accent); margin-bottom: 10px; }
+.ts-dots { position: absolute; left: 50%; bottom: 28px; display: flex; align-items: center; gap: 2px; padding: 6px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 78%, transparent); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  opacity: 0; transform: translate(-50%, 14px); pointer-events: none; transition: opacity .35s ease, transform .45s cubic-bezier(.16,1,.3,1); }
+.ts-dots.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.ts-dot { all: unset; position: relative; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer; transition: width .35s cubic-bezier(.16,1,.3,1); }
+.ts-dot::before { content: ""; width: 12px; height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--fg) 38%, transparent); transition: width .35s cubic-bezier(.16,1,.3,1), background .2s; }
+.ts-dot:hover::before, .ts-dot:focus-visible::before { background: var(--fg); }
+.ts-dot.is-current { width: 56px; }
+.ts-dot.is-current::before { width: 40px; background: var(--accent); }
+.ts-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 999px; }
+.ts-dot::after { content: attr(data-label); position: absolute; bottom: 46px; left: 50%; transform: translate(-50%, 6px); white-space: nowrap;
+  font-family: var(--font-body); font-size: 22px; font-weight: 500; color: var(--fg); padding: 10px 16px; border-radius: 12px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); border: 1px solid var(--line); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.ts-dot:hover::after, .ts-dot:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.ts-dot:first-child::after { left: 0; transform: translate(0, 6px); } .ts-dot:first-child:hover::after { transform: translate(0, 0); }
+.ts-dot:last-child::after { left: auto; right: 0; transform: translate(0, 6px); } .ts-dot:last-child:hover::after { transform: translate(0, 0); }
 .ts-help { position: absolute; left: 50%; top: 40px; transform: translateX(-50%); font-size: 20px; padding: 14px 26px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 85%, transparent); border: 1px solid var(--line); color: var(--muted); }
 .ts-help b { color: var(--fg); margin-right: 10px; }
 

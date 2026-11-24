@@ -33,8 +33,9 @@
 | `data-bloom` | 0 to 1.5 glow strength (0 turns it off) | 0.4 dark themes, 0 light themes |
 | `data-ambient` | `stars` · `dust` · `none` | `stars` |
 | `data-transition` | duration multiplier (0.6 is snappier, 1.4 is more cinematic) | 1 |
+| `data-dots` | slide dots: `auto` (always on the last slide; on other slides they appear when the pointer nears the bottom edge and hide 2s after it leaves) · `always` · `last` · `none` | `auto` |
 
-These can also be passed to `createDeck({ journey, bloom, ambient, transition, parallax, chrome, clickToAdvance })`.
+These can also be passed to `createDeck({ journey, bloom, ambient, transition, dots, parallax, chrome, clickToAdvance })`.
 
 URL flags: `?static` (no motion: for screenshots and reduced motion), `?nochrome` (hides the progress bar and counter), `?quality=low` (DPR 1, no bloom), `?slide=4` or `#/4` (start slide).
 
@@ -106,6 +107,8 @@ The presenter presses **N** to show them over the slide. Notes never show in scr
 ## Navigation (built in)
 
 → ↓ Space PageDown Enter: next · ← ↑ PageUp Backspace: back · Home/End · click (left 20% goes back) · swipe · mouse wheel · F fullscreen · N notes · ? help · URL hash `#/n`.
+
+Slide dots: one dot per slide at the bottom centre. Click one to fly straight to that slide; hover for a tooltip with its number and headline (taken from the slide's `h1`/`h2`/`blockquote`, or set `data-title="…"` on the section). See `data-dots` above for when they show.
 
 JS API: `window.deck` → `{ index, count, step, slides, go(i, {instant, allSteps}), next(), prev(), ready, on('change', fn), renderer, scene, camera, palette }`.
 
