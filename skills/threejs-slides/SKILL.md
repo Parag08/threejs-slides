@@ -106,6 +106,7 @@ Read **[references/authoring.md](references/authoring.md)** before writing slide
 - Steps: elements with `data-step="n"` appear one press at a time and the scene's `step(n)` is called. Use `data-scene-steps="n"` when the scene has more beats than there are elements.
 - Write real content. No lorem ipsum, no "Slide 3", and no invented statistics: if the user gave no numbers, use a non-numeric scene.
 - Put speaker notes in `<aside class="notes">` for talks.
+- Dot tooltips use each slide's `h1`/`h2`/`blockquote`. For slides whose headline is long or missing (statements, images), add a short `data-title="…"` to the `<section>`. Set `data-dots` on `.deck` (`auto` · `always` · `last` · `none`) only if the user asks.
 - Need a scene the library lacks (a product model, a custom metaphor)? See **[references/custom-scenes.md](references/custom-scenes.md)** and register it with `registerScene` in the deck's script. Don't edit `lib/scenes.js` for one deck.
 - Design guidance (typography, colour, density, what to avoid) is in **[references/design.md](references/design.md)**.
 
@@ -134,7 +135,9 @@ Repeat until clean. Delete the `qa/` folder before delivering unless the user wa
 
 Tell the user:
 - where the deck is, how to run it (`python3 -m http.server 8000 --directory <dir>`, or `npx serve <dir>`), and that they open `http://localhost:8000`
-- controls: → / Space next, ← back, F fullscreen, N speaker notes, ? help, deep links like `#/5`
+- controls: → / Space next, ← back, N speaker notes, ? help, deep links like `#/5`
+- **Fullscreen:** a "Fullscreen" button at the top centre is shown on the first slide (click it before presenting), and on other slides it appears when the mouse nears the top. The F key works too.
+- **Slide dots:** a row of dots at the bottom, one per slide, always shown on the last slide (for jumping back during Q&A) and on other slides when the mouse nears the bottom. Hover a dot for the slide's title, click to fly there.
 - how to change the theme (`data-theme` on `<html>` plus the font link; see authoring.md)
 
 Offer the follow-ups:

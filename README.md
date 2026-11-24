@@ -114,7 +114,7 @@ No build step and no framework. Three.js loads from a CDN through an import map,
 | **10 layouts** | title, center, split, split-reverse, bottom, top, statement, section, stats, cards |
 | **5 themes** | `nebula` · `ember` · `aurora` · `paper` · `mono`; the CSS variables colour the 3D too, and custom brand themes take a few lines |
 | **Build steps** | `data-step` reveals text *and* drives the scene (morph to the next shape, highlight the next orbit item, advance the timeline) |
-| **Presenter features** | speaker notes (N), fullscreen (F), deep links (`#/7`), keyboard, click, swipe and wheel navigation, progress bar |
+| **Presenter features** | **slide dots** (click to jump, title on hover; shown on the last slide and when the mouse nears the bottom), a **Fullscreen button** (top centre, shown on slide 1 and on top-edge hover), speaker notes (N), F for fullscreen, deep links (`#/7`), keyboard, click, swipe and wheel navigation, progress bar |
 | **Respectful** | honours `prefers-reduced-motion`, a fixed 16:9 stage that scales without reflowing, deterministic scenes |
 | **Export** | single self-contained HTML (`bundle.mjs`), PDF (`qa.mjs --pdf`), or any static host |
 
