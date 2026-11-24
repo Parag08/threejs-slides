@@ -108,6 +108,8 @@ The presenter presses **N** to show them over the slide. Notes never show in scr
 
 → ↓ Space PageDown Enter: next · ← ↑ PageUp Backspace: back · Home/End · click (left 20% goes back) · swipe · mouse wheel · F fullscreen · N notes · ? help · URL hash `#/n`.
 
+Fullscreen button: bottom-right, above the counter. It's always shown on the first slide until you enter fullscreen (that's when presenters want it), and on other slides it appears with the bottom-edge hover. The F key does the same. It's hidden where the browser doesn't allow fullscreen (e.g. iOS Safari). Turn it off with `createDeck({ fullscreenButton: false })`.
+
 Slide dots: one dot per slide at the bottom centre. Click one to fly straight to that slide; hover for a tooltip with its number and headline (taken from the slide's `h1`/`h2`/`blockquote`, or set `data-title="…"` on the section). See `data-dots` above for when they show.
 
 JS API: `window.deck` → `{ index, count, step, slides, go(i, {instant, allSteps}), next(), prev(), ready, on('change', fn), renderer, scene, camera, palette }`.

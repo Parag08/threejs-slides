@@ -84,3 +84,9 @@ No text colour can contrast with both a dark background and bright particles (wh
 - One 12px dot per slide in a frosted pill at bottom centre (28px from the edge); the current slide is a 40px accent pill. Hit area is 34px.
 - Tooltip on hover/focus: `n · headline`, body font 22px, on a 92% bg panel.
 - Visibility (`data-dots="auto"`): always on the last slide; elsewhere it shows when the pointer is in the bottom 16% of the stage and hides 2s after it leaves. Fades and slides up over 0.35–0.45s.
+
+## Fullscreen button
+
+- 56px frosted square, bottom-right (40px from the right, 74px from the bottom, above the counter); corner-arrows icon that swaps to "exit".
+- Tooltip "Fullscreen · F" / "Exit fullscreen · F".
+- Shown on slide 1 until fullscreen is entered; elsewhere it shares the dots' bottom-edge hover reveal.

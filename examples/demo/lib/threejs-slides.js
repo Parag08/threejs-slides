@@ -391,25 +391,49 @@ async function createDeck(options = {}) {
     return b;
   });
   if (cfg.dots !== 'none') chrome.appendChild(dotsNav);
-  let dotsHover = false, dotsTimer = 0;
+  /* --- Fullscreen button: same reveal as the dots (pointer near the bottom edge). F key still works. --- */
+  const fsBtn = document.createElement('button');
+  fsBtn.type = 'button';
+  fsBtn.className = 'ts-fs';
+  const ICON_ENTER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+  const ICON_EXIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+  const toggleFullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.())?.catch?.(() => {});
+  const syncFs = () => {
+    const on = !!document.fullscreenElement;
+    fsBtn.innerHTML = on ? ICON_EXIT : ICON_ENTER;
+    fsBtn.setAttribute('aria-label', on ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)');
+    fsBtn.dataset.label = on ? 'Exit fullscreen · F' : 'Fullscreen · F';
+  };
+  syncFs();
+  fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+  document.addEventListener('fullscreenchange', () => { syncFs(); syncDots(); });
+  // iOS Safari and some embeds don't allow fullscreen on a page: don't show a button that can't work
+  if (document.fullscreenEnabled !== false && options.fullscreenButton !== false) chrome.appendChild(fsBtn);
+
+  // Bottom-edge hover reveals the dots (auto mode) and the fullscreen button.
+  let nearBottom = false, hideTimer = 0;
   const isLast = () => current === slides.length - 1;
   function syncDots() {
-    const show = cfg.dots === 'always' || ((cfg.dots === 'auto' || cfg.dots === 'last') && isLast()) || (cfg.dots === 'auto' && dotsHover);
+    const show = cfg.dots === 'always' || ((cfg.dots === 'auto' || cfg.dots === 'last') && isLast()) || (cfg.dots === 'auto' && nearBottom);
     dotsNav.classList.toggle('is-shown', show);
+    // first slide: always offer fullscreen (that's when you want it) until you're in it; elsewhere hover-only
+    fsBtn.classList.toggle('is-shown', nearBottom || (current === 0 && !document.fullscreenElement));
   }
-  if (cfg.dots === 'auto') {
-    window.addEventListener('pointermove', (e) => {
-      const r = stage.getBoundingClientRect();
-      const near = e.clientY > r.bottom - r.height * 0.16 && e.clientY < r.bottom + 40;
-      if (near) { clearTimeout(dotsTimer); if (!dotsHover) { dotsHover = true; syncDots(); } }
-      else if (dotsHover && !dotsNav.matches(':hover')) {
-        clearTimeout(dotsTimer);
-        dotsTimer = setTimeout(() => { dotsHover = false; syncDots(); }, 2000);
-      }
-    });
-    dotsNav.addEventListener('focusin', () => { dotsHover = true; syncDots(); });
-    dotsNav.addEventListener('focusout', () => { dotsHover = false; syncDots(); });
-  }
+  const setNear = (v) => { if (v !== nearBottom) { nearBottom = v; syncDots(); } };
+  window.addEventListener('pointermove', (e) => {
+    const r = stage.getBoundingClientRect();
+    const near = e.clientY > r.bottom - r.height * 0.16 && e.clientY < r.bottom + 40;
+    if (near) { clearTimeout(hideTimer); setNear(true); }
+    else if (nearBottom && !dotsNav.matches(':hover') && !fsBtn.matches(':hover')) {
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => setNear(false), 2000);
+    }
+  });
+  document.documentElement.addEventListener('pointerleave', () => { clearTimeout(hideTimer); hideTimer = setTimeout(() => setNear(false), 600); });
+  [dotsNav, fsBtn].forEach((el) => {
+    el.addEventListener('focusin', () => setNear(true));
+    el.addEventListener('focusout', () => setNear(false));
+  });
 
   function updateChrome() {
     const s = slides[current];
@@ -480,7 +504,7 @@ async function createDeck(options = {}) {
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
     else if (k === 'Home') go(0);
     else if (k === 'End') go(slides.length - 1, { allSteps: true });
-    else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+    else if (k === 'f' || k === 'F') toggleFullscreen();
     else if (k === 'n' || k === 'N') toggle(notesBox);
     else if (k === '?' || k === 'h') toggle(helpBox);
   });
