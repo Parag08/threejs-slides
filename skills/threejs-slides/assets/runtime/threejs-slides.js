@@ -69,7 +69,7 @@ function layoutDim(el) {
   const c = el.classList;
   if (c.contains('layout-split') || c.contains('layout-split-reverse')) return 1;
   if (c.contains('layout-bottom') || c.contains('layout-top') || c.contains('layout-stats')) return 0.7;
-  if (['layout-title', 'layout-center', 'layout-statement', 'layout-section', 'layout-cards'].some((k) => c.contains(k))) return 0.42;
+  if (['layout-title', 'layout-center', 'layout-statement', 'layout-section', 'layout-cards', 'layout-summary', 'layout-compare', 'layout-table'].some((k) => c.contains(k))) return 0.42;
   return 1;
 }
 
@@ -125,6 +125,38 @@ function prepareSlideHTML(el) {
   });
 }
 
+/* === SLIDE FURNITURE: tracker, source line, sticker ======================
+   Consulting conventions, injected into the slide itself (not the chrome) so
+   they also appear in screenshots and PDF exports.
+   - Acts: every .layout-section slide starts an act; its .num + h2 name it.
+     data-appendix on a section starts the appendix.
+   - Tracker: "02 · What I built" top-left on the act's content slides.
+   - data-source="…" on a section → .source footnote at the bottom-left.
+   - data-sticker="Illustrative" on a section → .sticker tag at the top-right. */
+function readActs(els) {
+  let act = null;
+  return els.map((el) => {
+    if (el.classList.contains('layout-section')) {
+      const num = el.querySelector('.num')?.textContent.trim() || '';
+      const name = (el.dataset.title || el.querySelector('h2, h1')?.textContent || '').replace(/\s+/g, ' ').trim();
+      act = el.hasAttribute('data-appendix') ? { num: '', name: name || 'Appendix', appendix: true } : { num, name };
+      return null; // the divider itself shows no tracker
+    }
+    return act;
+  });
+}
+
+function addFurniture(el, act, cfg, actCount) {
+  const make = (cls, text) => { const d = document.createElement('div'); d.className = cls; d.textContent = text; d.dataset.furniture = ''; return d; };
+  const trackerOn = cfg.tracker === 'always' || (cfg.tracker === 'auto' && actCount >= 2);
+  const skip = el.classList.contains('layout-title') || el.classList.contains('layout-section') || el.hasAttribute('data-no-tracker');
+  if (trackerOn && act && !skip && !el.querySelector('.tracker')) {
+    el.prepend(make('tracker', act.num ? `${act.num} · ${act.name}` : act.name));
+  }
+  if (el.dataset.source && !el.querySelector('.source')) el.appendChild(make('source', el.dataset.source));
+  if (el.dataset.sticker && !el.querySelector('.sticker')) el.appendChild(make('sticker', el.dataset.sticker));
+}
+
 function countUp(el, motion) {
   const target = parseFloat(el.dataset.count);
   if (!Number.isFinite(target)) return;
@@ -156,12 +188,14 @@ async function createDeck(options = {}) {
     journey: deckEl.dataset.journey || options.journey || 'drift',
     transition: Number(deckEl.dataset.transition || options.transition || 1),
     bloom: Number(deckEl.dataset.bloom ?? options.bloom ?? NaN),
+    brightness: Number(deckEl.dataset.brightness ?? options.brightness ?? 1),
     ambient: deckEl.dataset.ambient || options.ambient || 'stars',
     parallax: options.parallax ?? true,
     chrome: !qs.has('nochrome') && options.chrome !== false,
     quality: qs.get('quality') || options.quality || 'high',
     clickToAdvance: options.clickToAdvance ?? true,
     dots: deckEl.dataset.dots || options.dots || 'auto', // auto = last slide + bottom hover · always · last · none
+    tracker: deckEl.dataset.tracker || options.tracker || 'auto', // auto = shown when the deck has 2+ acts · always · none
   };
   const motion = reducedMotion ? 0.15 : 1;
   if (reducedMotion) root.classList.add('ts-reduced');
@@ -195,7 +229,7 @@ async function createDeck(options = {}) {
 
   /* --- Renderer --- */
   const palette = readPalette(root);
-  if (!Number.isFinite(cfg.bloom)) cfg.bloom = palette.isLight ? 0 : 0.4;
+  if (!Number.isFinite(cfg.bloom)) cfg.bloom = 0; // glow is opt-in: data-bloom="0.3" on .deck
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   renderer.setClearColor(palette.bg, 1);
   renderer.toneMapping = THREE.NoToneMapping; // keep scene colours identical to the CSS theme (OutputPass would tone-map the background too)
@@ -234,12 +268,15 @@ async function createDeck(options = {}) {
 
   /* --- Slides & their 3D scenes --- */
   const journeyFn = JOURNEYS[cfg.journey] || JOURNEYS.drift;
+  const acts = readActs(slideEls);
+  const actCount = slideEls.filter((el) => el.classList.contains('layout-section') && !el.hasAttribute('data-appendix')).length;
   const slides = slideEls.map((el, index) => {
     el.classList.add('slide');
     const notesEl = el.querySelector('aside.notes, .notes');
     const stepNums = [...new Set([...el.querySelectorAll('[data-step]')].map((s) => Number(s.dataset.step) || 1))].sort((a, b) => a - b);
     const sceneSteps = Number(el.dataset.sceneSteps || 0);
     prepareSlideHTML(el);
+    addFurniture(el, acts[index], cfg, actCount);
     return {
       el, index, stepNums,
       totalSteps: Math.max(stepNums.length, sceneSteps),
@@ -250,7 +287,8 @@ async function createDeck(options = {}) {
       offset: parseVec(el.dataset.offset) || layoutOffset(el),
       scale: Number(el.dataset.scale || 1),
       dim: el.dataset.dim != null ? Number(el.dataset.dim) : layoutDim(el),
-      brightness: el.dataset.brightness != null ? Number(el.dataset.brightness) : 1,
+      // data-brightness on .deck multiplies every slide's own data-brightness.
+      brightness: (el.dataset.brightness != null ? Number(el.dataset.brightness) : 1) * (Number.isFinite(cfg.brightness) ? cfg.brightness : 1),
       notes: notesEl ? notesEl.innerHTML : (el.dataset.notes || ''),
       vis: 0, visFrom: 0, visTo: 0, group: null, inst: null, mats: [],
     };
@@ -301,6 +339,11 @@ async function createDeck(options = {}) {
     const cam = inst.camera || {};
     s.camOffset = parseVec(s.el.dataset.camera) || cam.offset || [0, 0, 8];
     s.lookOffset = parseVec(s.el.dataset.look) || cam.look || [0, 0, 0];
+    // data-scene-steps only counts when the scene reacts to steps; otherwise presses would do nothing
+    if (!inst.step && s.totalSteps > s.stepNums.length) {
+      console.warn(`[threejs-slides] slide ${s.index + 1}: data-scene-steps ignored, scene "${s.sceneName}" has no build steps`);
+      s.totalSteps = s.stepNums.length;
+    }
     Object.assign(s, { group, inst, mats });
   }
 
@@ -619,6 +662,8 @@ async function createDeck(options = {}) {
     get index() { return current; },
     get count() { return slides.length; },
     get step() { return slides[current].step; },
+    /** Text on the current slide's 3D that a line or other text cuts through (chart scenes). Used by qa.mjs. */
+    textCollisions() { const s = slides[current]; scene.updateMatrixWorld(true); camera.updateMatrixWorld(); return s.inst.collisions?.(camera) ?? []; },
     slides: slides.map((s) => s.el),
     go, next, prev, ready,
     on(evt, fn) { if (evt === 'change') listeners.add(fn); return () => listeners.delete(fn); },

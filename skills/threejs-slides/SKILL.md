@@ -15,18 +15,19 @@ my-deck/
 ├── index.html          ← you write this: one <section> per slide
 └── lib/                ← copied by scripts/new-deck.sh; don't edit unless extending the runtime
     ├── threejs-slides.js   engine: stage, camera journey, transitions, input, notes
-    ├── scenes.js           12 built-in 3D scenes
+    ├── scenes.js           17 built-in 3D scenes, incl. the chart kit
     └── threejs-slides.css  stage, layouts, animations, 5 themes
 ```
 
 ## Core rules
 
 1. **Motion carries meaning.** Every 3D scene and every build step must say something the words alone don't. If a scene is only decoration, use a quieter one (`none`, `network`, `galaxy`) or none at all.
-2. **One idea per slide.** Speaker decks: a headline plus at most 3 short points. If content overflows, split the slide. Never shrink the text.
+2. **Action titles, one idea per slide.** The headline is the slide's takeaway as a sentence. Speaker decks: a headline plus at most 3 short points. If content overflows, split the slide. Never shrink the text.
 3. **Fixed 1920×1080 stage.** The runtime scales the whole stage to fit. Don't add media queries that reflow slides, and size everything in px at 1920×1080.
-4. **Text and 3D never fight.** The 3D reads best *beside* the text. Use layouts that keep them apart (`layout-split` puts 3D on the right, `layout-split-reverse` on the left, `layout-bottom` puts it above the text). In `layout-center` / `layout-title`, pick a scene that reads as background. The runtime adds text halos and scrims and dims 3D that sits behind text (`data-dim` overrides). Never set running text in `--accent` over a scene.
-5. **Vary the rhythm.** Never use the same scene on two consecutive slides. Put a `layout-section` + `tunnel` slide between acts. Bookending a deck with the same scene (title and closing) is fine.
-6. **Verify visually.** Don't hand over a deck you haven't screenshotted slide by slide (Phase 5).
+4. **Text and 3D never fight.** The 3D reads best *beside* the text. Use layouts that keep them apart (`layout-split` puts 3D on the right, `layout-split-reverse` on the left, `layout-bottom` puts it above the text). In `layout-center` / `layout-title`, pick a scene that reads as background. The runtime adds a scrim behind text and dims 3D that sits behind it (`data-dim` overrides). Never set running text in `--accent` over a scene.
+5. **No text is ever cut.** No line, shape or other text may pass through any text, HTML or 3D: headlines, labels, values, callouts. Charts leave gaps in their rules around labels and move labels to a free spot; if a screenshot still shows text crossed by a line, a bar or another label, move the label, the object (`data-offset`, `data-scale`) or the layout until it's clear.
+6. **Vary the rhythm.** Never use the same scene on two consecutive slides. Put a `layout-section` + `tunnel` slide between acts. Bookending a deck with the same scene (title and closing) is fine.
+7. **Verify visually.** Don't hand over a deck you haven't screenshotted slide by slide (Phase 5).
 
 ## Phase 0: Detect the mode
 
@@ -55,19 +56,41 @@ When the user says "just make it", infer all four and state your assumptions in 
 
 ## Phase 2: Storyboard
 
-Before writing HTML, plan the deck as a table and show it to the user. For decks of 8 or more slides, wait for a quick OK unless they asked you to just go ahead:
+Plan the **story before the scenes**. A deck that picks a scene per slide without an arc reads like a template tour. Work in this order:
 
-| # | Message (one sentence) | Layout | Scene | Motion beat |
-|---|---|---|---|---|
-| 1 | Slides can fly | title | galaxy | letters reveal, galaxy turns |
-| 2 | One cloud, many shapes | split | morph (sphere→torus→helix) | each → morphs + reveals a point |
+**2a. Pick the arc and name the acts.** Read **[references/arcs.md](references/arcs.md)** and choose the arc from what the audience must do or believe at the end. The common ones:
 
-To pick a scene for each message, read **[references/scenes.md](references/scenes.md)**: it covers every scene's meaning, params, steps and best layout. Quick map:
+| Deck type | Arc (acts) |
+|---|---|
+| Case study / build story | The problem → What I built → Rollout and results → close |
+| Recommendation (SCR) | Exec summary → Situation → Complication → Options → Recommendation → Plan → ask |
+| Business case / financial projection | Exec summary → Assumptions → Revenue → Costs → Projections → Scenarios and risks → Returns → ask |
+| Pitch | Problem → Solution → Market → Traction → Model → Competition → Team → Financials → ask |
+| Business review | Exec summary → Results vs plan → Drivers → Wins and misses → Next period |
+| Talk / teaching | Hook → Why it matters → How it works → In practice → takeaway |
+
+Rules: 3–5 acts (6 for a business case). Open every act with a `layout-section` + `tunnel` divider (`.num` + act name). The title slide comes before act 1; business decks put an executive summary (`layout-summary`) right after the title; the closing ask comes after the last act. Each slide belongs to exactly one act; if a slide fits two (for example "hub siting", both built and rolled out), split the message: *what it is* goes in the build act, *how people took it* in the rollout act.
+
+**2b. Give every slide a job (archetype).** Read **[references/archetypes.md](references/archetypes.md)**. Each slide does one job (frame, situate, quantify, explain, decide or plan) through one archetype (KPI headline, trend, evaluation table, process, …), and the archetype sets the layout and scene. Write every content headline as an **action title**: the takeaway as a sentence ("Km per order fell 25% after launch"), never a label ("Results").
+
+**2c. Storyboard table.** Show the arc and the table to the user before writing HTML. For decks of 8 or more slides, wait for a quick OK unless they asked you to just go ahead:
+
+| # | Act | Archetype | Action title | Layout | Scene | Motion beat |
+|---|---|---|---|---|---|---|
+| 1 | — | Title | Logistics Valeo | title | galaxy | letters reveal, galaxy turns |
+| 2 | 01 Problem | Divider | The problem | section | tunnel | rings rush in |
+| 3 | 01 Problem | KPI headline | Manual claiming lost a third of orders | stats + top | terrain | numbers count up |
+| 4 | 02 Built | Transformation | The engine accepts what the fleet can serve | split | morph (scatter→sphere→torus) | each step morphs + reveals a rule |
+
+Check the table before moving on: does reading only the Action title column tell the story in order? Does every act have at least one content slide? Is there a closing action?
+
+**2d. Then pick scenes.** The archetype usually names the scene. Otherwise read **[references/scenes.md](references/scenes.md)**: it covers every scene's meaning, params, steps and best layout. Quick map:
 
 - opening / closing / big idea → `galaxy`, `knot`, `blob`
 - transformation, "from X to Y", phases → `morph` with build steps
 - global, reach, markets, network effects → `globe`, `network`
-- growth, comparisons, metrics → `bars` (real numbers only), stats layout over `terrain`
+- comparisons, rankings, composition → `bars` (grouped, stacked, horizontal, target, delta); key numbers → stats layout over `terrain`
+- trends and projections → `line` (forecast + band); bridges → `waterfall`; correlation → `scatter`; prioritising → `matrix`; roadmaps with workstreams → `gantt`. Real numbers only, with `data-source`
 - a system of parts, ecosystem, team → `orbit` with steps highlighting each item
 - roadmap, history, process → `timeline` with steps
 - scale, data, infrastructure → `cubes`
@@ -123,10 +146,15 @@ The script screenshots every slide with all build steps shown, and flags element
 
 **Option B, a browser tool** (if you have one): serve with `python3 -m http.server 8000 --directory <output-dir>`, open `http://localhost:8000/?static`, then for each slide run `deck.go(i, {instant:true, allSteps:true})` and screenshot.
 
+The script also flags **3D text that is cut**: chart labels crossed by a line (target, trend, forecast, today, a series) or overlapping another label (`3D text cut: …`). These are errors: fix every one.
+
+It also prints a **ghost deck** (every title in order, grouped by act; saved to `qa/ghost-deck.md`) and **story checks**: label-style titles, number slides without a source, long decks without acts. Read the ghost deck: if the titles alone don't tell the story, fix the titles before anything else.
+
 Then **look at every screenshot** and fix:
+- any text crossed by a line, shape or other text → move it clear (this includes HTML text over 3D: change layout or `data-offset`)
 - text sitting on a busy part of the scene → change layout, set `data-offset`, or pick a calmer scene
 - 3D cut off at the stage edge → reduce `data-scale` (e.g. `0.85`) or adjust `data-offset`
-- scenes too bright or washed out → lower `data-bloom` on `.deck`, or choose another scene
+- scenes too bright or washed out → lower `data-brightness` on `.deck` or the slide, or choose another scene
 - the same scene twice in a row, or a slide that says nothing → revise
 
 Repeat until clean. Delete the `qa/` folder before delivering unless the user wants it.
@@ -149,7 +177,9 @@ Offer the follow-ups:
 
 | File | Read when |
 |---|---|
-| [references/scenes.md](references/scenes.md) | Phase 2, choosing scenes and params |
+| [references/arcs.md](references/arcs.md) | Phase 2a, choosing the story arc and acts |
+| [references/archetypes.md](references/archetypes.md) | Phase 2b, the job and format of each slide |
+| [references/scenes.md](references/scenes.md) | Phase 2d, choosing scenes and params |
 | [references/authoring.md](references/authoring.md) | Phase 4, writing the HTML |
 | [references/design.md](references/design.md) | Phase 2 and 4, design quality and themes |
 | [references/custom-scenes.md](references/custom-scenes.md) | only when a custom 3D scene is needed |

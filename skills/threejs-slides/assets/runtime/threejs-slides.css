@@ -121,7 +121,6 @@ html:not(.ts-ready) .deck > section { transition: none; }
    1. a halo hugging each glyph, 2. a soft gradient scrim behind the text area.
    Tune with --scrim on a slide (e.g. style="--scrim: 50%") or remove with .no-scrim. */
 .slide { --halo: color-mix(in srgb, var(--bg) 92%, transparent); --scrim: 78%; isolation: isolate; }
-body.ts-body .slide { text-shadow: 0 0 2px var(--halo), 0 0 8px var(--halo), 0 2px 26px var(--halo); }
 .slide pre.code, .slide .card, .slide .chip { text-shadow: none; }
 .slide::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   --s: color-mix(in srgb, var(--bg) var(--scrim), transparent);
@@ -129,7 +128,7 @@ body.ts-body .slide { text-shadow: 0 0 2px var(--halo), 0 0 8px var(--halo), 0 2
 .layout-split::before { background: linear-gradient(90deg, var(--s) 0%, var(--s) 30%, transparent 58%); }
 .layout-split-reverse::before { background: linear-gradient(270deg, var(--s) 0%, var(--s) 30%, transparent 58%); }
 .layout-bottom::before { background: linear-gradient(0deg, var(--s) 0%, var(--s) 18%, transparent 48%); }
-.layout-top::before, .layout-stats::before, .layout-cards::before { background: linear-gradient(180deg, var(--s) 0%, var(--s) 28%, transparent 78%); }
+.layout-top::before, .layout-stats::before, .layout-cards::before, .layout-summary::before, .layout-compare::before, .layout-table::before { background: linear-gradient(180deg, var(--s) 0%, var(--s) 28%, transparent 78%); }
 .layout-statement::before { background: radial-gradient(ellipse 62% 55% at 34% 50%, var(--s) 0%, transparent 100%); }
 .slide.no-scrim::before { display: none; }
 .layout-title, .layout-center, .layout-statement, .layout-section { --scrim: 86%; }
@@ -161,6 +160,72 @@ body.ts-body .slide { text-shadow: 0 0 2px var(--halo), 0 0 8px var(--halo), 0 2
 
 .chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 40px; }
 .chip { font-family: var(--font-mono); font-size: 22px; padding: 12px 22px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
+
+/* === BUSINESS LAYOUTS (consulting formats) ============================== */
+
+/* layout-summary: executive summary. ol.summary > li > b (action sentence) + span (support) */
+.layout-summary { display: flex; flex-direction: column; justify-content: center; }
+.layout-summary h2 { font-size: 84px; }
+.slide ol.summary { list-style: none; padding: 0; margin: 64px 0 0; display: grid; gap: 30px; counter-reset: sum; max-width: 1500px; }
+.slide ol.summary li { counter-increment: sum; display: grid; grid-template-columns: 92px 1fr; column-gap: 8px; align-items: baseline; padding-top: 26px; border-top: 2px solid var(--line); }
+.slide ol.summary li::before { content: counter(sum, decimal-leading-zero); grid-row: span 2; font-family: var(--font-mono); font-size: 26px; font-weight: 600; color: var(--accent); }
+.slide ol.summary li b { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: -0.01em; font-size: 40px; line-height: 1.15; color: var(--fg); }
+.slide ol.summary li span { margin-top: 8px; font-size: 26px; color: var(--text-2); }
+
+/* layout-compare: two columns (before/after, situation/complication, option A/B).
+   .compare > .col (+ .col.is-key for the one that matters) > h3 + ul.points | p */
+.layout-compare { display: flex; flex-direction: column; justify-content: center; }
+.layout-compare h2 { font-size: 84px; }
+.compare { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; margin-top: 70px; }
+.compare::after { content: "→"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--font-display); font-size: 64px; color: var(--accent); }
+.compare.no-arrow::after { display: none; }
+.compare .col { background: var(--panel); border: 1px solid var(--line); border-radius: 26px; padding: 44px 46px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); text-shadow: none; }
+.compare .col.is-key { border-color: color-mix(in srgb, var(--accent) 70%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent) inset; }
+.compare .col h3 { font-family: var(--font-mono); font-size: 24px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 22px; }
+.compare .col.is-key h3 { color: color-mix(in srgb, var(--accent) 60%, var(--fg)); }
+.compare .col p { font-size: 32px; color: var(--fg); }
+.compare .col ul.points { margin-top: 0; gap: 20px; }
+.compare .col ul.points li { font-size: 29px; max-width: none; }
+
+/* layout-table: options × criteria, P&L, next steps. table.data; td.num right-aligns numbers; tr.is-key highlights a row. */
+.layout-table { display: flex; flex-direction: column; justify-content: center; }
+.layout-table h2 { font-size: 80px; }
+.slide table.data { margin-top: 60px; border-collapse: separate; border-spacing: 0; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); text-shadow: none; }
+.slide table.data th, .slide table.data td { padding: 20px 30px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--line); }
+.slide table.data tr:last-child td { border-bottom: 0; }
+.slide table.data th { font-family: var(--font-mono); font-size: 22px; font-weight: 600; letter-spacing: 0.03em; color: var(--muted); background: color-mix(in srgb, var(--fg) 4%, transparent); }
+.slide table.data td { font-size: 28px; color: var(--text-2); font-weight: 450; }
+.slide table.data td:first-child { color: var(--fg); font-weight: 600; }
+.slide table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+.slide table.data th.c, .slide table.data td.c { text-align: center; }
+.slide table.data tr.is-key td { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--fg); }
+.slide table.data tr.is-key td:first-child { box-shadow: 5px 0 0 var(--accent) inset; }
+
+/* Harvey ball: <span class="harvey" data-v="0..4"></span> (0 empty → 4 full) */
+.harvey { --v: 0; display: inline-block; width: 34px; height: 34px; border-radius: 50%; vertical-align: middle; border: 2.5px solid var(--fg);
+  background: conic-gradient(var(--fg) calc(var(--v) * 25%), transparent 0); }
+.harvey[data-v="1"] { --v: 1; } .harvey[data-v="2"] { --v: 2; } .harvey[data-v="3"] { --v: 3; } .harvey[data-v="4"] { --v: 4; }
+/* Marks: <span class="mark yes"></span> ✓ · .no ✗ · .part ◐ */
+.mark { display: inline-block; font-family: var(--font-body); font-weight: 700; font-size: 32px; line-height: 1; }
+.mark.yes::before { content: "✓"; color: var(--accent); }
+.mark.no::before { content: "✗"; color: var(--muted); }
+.mark.part::before { content: "◐"; color: var(--text-2); }
+
+/* === CONSULTING FURNITURE ================================================= */
+/* Injected by the runtime (data-source / data-sticker / acts) or written by hand. */
+.slide > [data-furniture] { width: auto !important; max-width: 1300px; }
+.slide .tracker { position: absolute; left: 140px; top: 50px; font-family: var(--font-mono); font-size: 20px; font-weight: 600; letter-spacing: 0.06em; color: var(--muted); }
+.slide .source { position: absolute; left: 140px; bottom: 44px; max-width: 1300px; font-size: 20px; line-height: 1.35; color: var(--muted); }
+.slide .source::before { content: "Source: "; font-weight: 700; }
+.slide .source.no-label::before { content: none; }
+.slide .sticker { position: absolute; right: 140px; top: 44px; font-family: var(--font-mono); font-size: 20px; font-weight: 600; letter-spacing: 0.05em; padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--accent-2); color: color-mix(in srgb, var(--accent-2) 70%, var(--fg)); background: color-mix(in srgb, var(--bg) 70%, transparent); text-shadow: none; }
+/* Delta: <span class="delta down good">25%</span>. up/down sets the arrow; good/bad sets the colour (down can be good). */
+.delta { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-weight: 600; font-size: 0.5em; vertical-align: middle; color: var(--text-2); }
+.delta.up::before { content: "▲"; font-size: 0.8em; }
+.delta.down::before { content: "▼"; font-size: 0.8em; }
+.delta.good { color: var(--accent); }
+.delta.bad { color: var(--accent-2); }
+.stat .label .delta, p .delta, li .delta { font-size: 0.9em; }
 
 /* Legibility over busy 3D: optional scrim on the text side */
 .scrim-left::after, .scrim-right::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
@@ -245,3 +310,6 @@ html.ts-reduced .slide [data-anim], html.ts-reduced .slide .ts-letter, html.ts-r
 @media print {
   @page { size: 1920px 1080px; margin: 0; }
 }
+
+/* Screen-reader-only data table written by chart scenes */
+.ts-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

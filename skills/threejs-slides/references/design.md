@@ -4,7 +4,7 @@ The 3D is there to make the argument land. A deck that looks like a screensaver 
 
 ## Story first
 
-1. **Write the spine.** Before choosing any scene, write the 6–15 one-sentence messages of the deck in order. Each slide states one of them.
+1. **Pick the arc, then write the spine.** Choose the deck's arc first (SKILL.md Phase 2a: for example problem → what I built → rollout and results) and name its 3–5 acts. Then write the 6–15 one-sentence messages in order, each under its act. Each slide states one of them. Scenes come last.
 2. **Find the turns.** Mark the 2–4 moments where the argument changes direction (problem → insight → solution → proof → ask). Those slides get the strongest motion: a `morph` with steps, a `tunnel` act break, a camera journey with real distance.
 3. **Quiet in between.** Slides that support a turn use calmer scenes (`network`, `terrain`, `none`) so the big moments stand out. Not every slide needs a hero object.
 4. **End on an action.** The last slide says what to do next (install, decide, contact), not just "Thank you".
@@ -57,8 +57,15 @@ Avoid motion that contradicts the message, like a frantic tunnel under "stabilit
 
 ## Anti-patterns
 
+- Text cut through by a line, a shape or other text: a target line through a value, a trend line through a point label, a bar over a category name. Text always sits on clear space.
+
+- Picking scenes before the arc: slides in the order the scene library suggests rather than the order the story needs.
+- Acts with no divider, or a "what I built" slide sitting inside the problem act.
+
 - The same scene on consecutive slides (galaxy, galaxy, galaxy).
 - Hero objects behind centred paragraphs.
-- Invented numbers in `bars` or `.stats` to make a slide look "data-driven".
+- Invented numbers in any chart or `.stats` to make a slide look "data-driven".
+- Rainbow charts. Highlight the one bar, point or row that proves the headline; the kit greys out the rest.
+- A chart without `data-source`, or a line whose y axis doesn't start at zero without saying so.
 - Bloom cranked up until colours clip to white. If it glows everywhere, nothing stands out.
 - Ten slides of `layout-split` in a row. Alternate layouts every 2–3 slides.
