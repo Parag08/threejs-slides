@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: should-use-threejs-named
+description: The skill activates for a request it is meant for.
+tags: [activation, positive]
+runs: 1
+execution:
+  max_turns: 3
+  timeout_seconds: 180
+  allowed_tools: [Skill, Read, Glob]
+  prompt: |
+    Build a slide deck with Three.js for a 10-minute talk on how GPS works.
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?threejs-slides"'
+    min: 1
+    arm: both

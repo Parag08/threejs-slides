@@ -1,0 +1,61 @@
+schema_version: "1.1"
+name: existing-markdown
+description: Builds a complete deck from a brief and verifies it.
+tags: [quality]
+runs: 1
+execution:
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Bash, Write, Edit]
+  prompt: |
+    Make an animated presentation from this markdown (it is all the content I have):
+
+    # Field Notes 2026
+    ## We visited 14 farms
+    ## What we saw: water is the constraint, not land
+    ## Three fixes: drip lines, shared storage, sensor alerts
+    ## Pilot: 3 farms, starting March
+    ## Ask: two volunteers per weekend
+
+    Save it in a folder called `deck` in the current directory. Go straight ahead: don't ask me questions or wait for me to approve the storyboard, make sensible assumptions.
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?threejs-slides"'
+  - name: deck-written
+    type: file_exists
+    path: deck/index.html
+  - name: runtime-scaffolded
+    type: file_exists
+    path: deck/lib/threejs-slides.js
+  - name: ran-visual-qa
+    type: tool_used
+    tool: Bash
+    input_match: 'qa\.mjs|deck\.go\('
+  - name: no-placeholders
+    type: regex
+    target: { source: file, path: deck/index.html }
+    pattern: 'lorem ipsum|\{\{[A-Z_]+\}\}|>\s*Slide \d+\s*<'
+    flags: i
+    match: not_contains
+  - name: deck-quality
+    type: llm
+    weight: 3
+    focus: { source: file, path: deck/index.html }
+    criteria: |
+      Grade the deck in deck/index.html against the brief and the skill's rules.
+      PASS only if ALL of these hold:
+      - It has between 5 and 8 <section> slides.
+      - No 3D scene (data-scene) is used on two consecutive slides (using the same scene for the first and last slide is fine).
+      - Each slide has one idea: a short headline (about 9 words or fewer) and at most 3 bullet points or 4 cards/stats.
+      - The content is real and specific to the brief: no lorem ipsum, no "Slide 3", no placeholder text.
+      - The scenes fit what each slide says (e.g. growth → bars/terrain, sequence → timeline, reach → globe, change → morph), not random decoration.
+      - Keeps every heading from the markdown, uses only the numbers present (14 farms, 3 farms, two volunteers), and turns "three fixes" into one slide with three parallel items.
+      FAIL if any of these is violated. Say which one.
+  - name: handover
+    type: llm
+    criteria: |
+      PASS if the final message tells the user where the deck is, how to run it
+      over a local web server (not by double-clicking index.html), and the basic
+      controls (arrow keys / space to advance). FAIL otherwise.

@@ -142,6 +142,7 @@ threejs-slides/
 │       ├── runtime/           # threejs-slides.js · scenes.js · threejs-slides.css
 │       └── template/          # starter index.html
 ├── examples/demo/             # the demo deck (built with this skill)
+├── evals/                     # `claude plugin eval` suite + check-deck.mjs
 └── docs/                      # README media
 ```
 
@@ -165,7 +166,7 @@ python3 -m http.server 8000      # open http://localhost:8000/examples/demo/
 
 ## Contributing
 
-Issues and PRs are welcome, especially new scenes. A scene is one factory function (see [custom-scenes.md](skills/threejs-slides/references/custom-scenes.md)). To add one to the built-in library, put it in `assets/runtime/scenes.js`, document it in `references/scenes.md`, add a slide to the demo, and run `node skills/threejs-slides/scripts/qa.mjs examples/demo`. After changing the runtime, run `bash scripts/sync-runtime.sh` to update the demo's copy.
+Issues and PRs are welcome, especially new scenes. A scene is one factory function (see [custom-scenes.md](skills/threejs-slides/references/custom-scenes.md)). To add one to the built-in library, put it in `assets/runtime/scenes.js`, document it in `references/scenes.md`, add a slide to the demo, and run `node skills/threejs-slides/scripts/qa.mjs examples/demo`. After changing the runtime, run `bash scripts/sync-runtime.sh` to update the demo's copy. Before and after changing `SKILL.md` or a reference, run the evals: `claude plugin eval . --tag activation --ablation none` is quick, and [evals/README.md](evals/README.md) covers the full-deck suite.
 
 ## License
 

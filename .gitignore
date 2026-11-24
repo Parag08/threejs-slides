@@ -3,3 +3,4 @@ qa/
 deck.html
 .DS_Store
 *.log
+evals/results/

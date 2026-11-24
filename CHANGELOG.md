@@ -7,6 +7,7 @@
 - Orbit and bars scenes about 20% less bright; new `data-brightness` per slide
 - Fullscreen button: a labelled pill at top centre, shown on the first slide until you go fullscreen, otherwise on hover near the top edge
 - Slide dots: click to jump, title tooltips; shown on the last slide and on hover near the bottom edge (`data-dots`)
+- Evals: `evals/` suite for `claude plugin eval`, 13 activation cases and 8 full-deck briefs, plus `evals/check-deck.mjs` for structural checks and screenshot QA on any deck
 
 ## 1.0.0 (2026-11-24)
 

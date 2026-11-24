@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: should-use-pitch-3d
+description: The skill activates for a request it is meant for.
+tags: [activation, positive]
+runs: 1
+execution:
+  max_turns: 3
+  timeout_seconds: 180
+  allowed_tools: [Skill, Read, Glob]
+  prompt: |
+    Make me an animated 3D pitch deck for my startup. We sell inventory software to small bakeries.
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?threejs-slides"'
+    min: 1
+    arm: both

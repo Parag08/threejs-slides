@@ -1,0 +1,59 @@
+schema_version: "1.1"
+name: research-paper
+description: Builds a complete deck from a brief and verifies it.
+tags: [quality]
+runs: 1
+execution:
+  max_turns: 80
+  timeout_seconds: 1800
+  allowed_tools: [Skill, Read, Glob, Grep, Bash, Write, Edit]
+  prompt: |
+    A short research talk for a daytime seminar room (paper theme) on our study: 1,204 participants, sleep under 6 hours raised error rates by 38% on a memory task, effect was smaller in people over 60. Methods, results, limitations, next steps.
+
+    Save it in a folder called `deck` in the current directory. Go straight ahead: don't ask me questions or wait for me to approve the storyboard, make sensible assumptions.
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?threejs-slides"'
+  - name: deck-written
+    type: file_exists
+    path: deck/index.html
+  - name: runtime-scaffolded
+    type: file_exists
+    path: deck/lib/threejs-slides.js
+  - name: ran-visual-qa
+    type: tool_used
+    tool: Bash
+    input_match: 'qa\.mjs|deck\.go\('
+  - name: no-placeholders
+    type: regex
+    target: { source: file, path: deck/index.html }
+    pattern: 'lorem ipsum|\{\{[A-Z_]+\}\}|>\s*Slide \d+\s*<'
+    flags: i
+    match: not_contains
+  - name: theme-paper
+    type: regex
+    target: { source: file, path: deck/index.html }
+    pattern: '<html[^>]*data-theme="paper"'
+    match: contains
+  - name: deck-quality
+    type: llm
+    weight: 3
+    focus: { source: file, path: deck/index.html }
+    criteria: |
+      Grade the deck in deck/index.html against the brief and the skill's rules.
+      PASS only if ALL of these hold:
+      - It has between 6 and 9 <section> slides.
+      - No 3D scene (data-scene) is used on two consecutive slides (using the same scene for the first and last slide is fine).
+      - Each slide has one idea: a short headline (about 9 words or fewer) and at most 3 bullet points or 4 cards/stats.
+      - The content is real and specific to the brief: no lorem ipsum, no "Slide 3", no placeholder text.
+      - The scenes fit what each slide says (e.g. growth → bars/terrain, sequence → timeline, reach → globe, change → morph), not random decoration.
+      - Uses only the figures given (1,204 participants, 38%) and includes a limitations slide.
+      FAIL if any of these is violated. Say which one.
+  - name: handover
+    type: llm
+    criteria: |
+      PASS if the final message tells the user where the deck is, how to run it
+      over a local web server (not by double-clicking index.html), and the basic
+      controls (arrow keys / space to advance). FAIL otherwise.
