@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-theme="nebula">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charts</title>
+  <!-- === FONTS (swap per theme — see references/themes.md) === -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Hanken+Grotesk:wght@400..700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+  <!-- === RUNTIME === -->
+  <link rel="stylesheet" href="lib/threejs-slides.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+  } }
+  </script>
+  <style>
+    /* === DECK-SPECIFIC STYLES (optional) === */
+  </style>
+</head>
+<body>
+  <!--
+    One <section> = one slide. Key attributes:
+      class="layout-*"   title | center | split | split-reverse | bottom | top | statement | section | stats | cards
+      data-scene         galaxy | morph | globe | terrain | orbit | bars | network | knot | blob | tunnel | cubes | timeline | none
+      data-params        JSON options for the scene
+      data-step="n"      build steps on elements; data-scene-steps="n" for scene-only steps
+      data-anim          rise | fade | left | right | zoom | blur | letters  (default: children rise)
+      <aside class="notes"> speaker notes (press N)
+  -->
+  <main class="deck" data-journey="line">
+  <section class="layout-bottom" data-scene="bars" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"unit":" km","data":[{"label":"Before","value":60},{"label":"Aug–Sep","value":45.3},{"label":"Sep","value":42.6,"highlight":true}],"gap":1.6,"delta":{"from":0,"to":2},"target":50,"targetLabel":"Goal 50 km"}'>
+    <h2>Km per order fell 29% and beat the goal</h2>
+  </section>
+  <section class="layout-bottom" data-scene="bars" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"mode":"grouped","labels":["Q1","Q2","Q3","Q4"],"series":[{"name":"Plan","values":[40,45,50,55]},{"name":"Actual","values":[38,47,56,61],"highlight":true}],"compact":true}'>
+    <h2>Actuals passed plan from Q2</h2>
+  </section>
+  <section class="layout-bottom" data-scene="bars" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"mode":"stacked","labels":["2024","2025","2026"],"series":[{"name":"SC","values":[30,42,55]},{"name":"IV","values":[12,20,31]},{"name":"Injection","values":[6,8,11]}]}'>
+    <h2>IV is the fastest-growing line</h2>
+  </section>
+  <section class="layout-split" data-scene="bars" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"orientation":"h","sort":"desc","data":[{"label":"Marina","value":18},{"label":"JLT","value":31,"highlight":true},{"label":"Deira","value":12},{"label":"Barsha","value":22},{"label":"Mirdif","value":-6}],"length":4.4,"unit":"%"}'>
+    <h2>JLT drives the most growth</h2>
+    <p class="lede">Ranking, sorted, with a negative value.</p>
+  </section>
+  <section class="layout-bottom" data-scene="line" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"labels":["2023","2024","2025","2026","2027","2028"],"forecast":4,"series":[{"name":"Revenue","values":[2.1,2.9,3.8,4.6,5.6,6.8],"low":[null,null,null,4.6,5.0,5.7],"high":[null,null,null,4.6,6.2,7.9],"highlightIndex":[3]},{"name":"Cost","values":[2.4,2.7,3.1,3.5,3.9,4.3]}],"unit":"M","prefix":"$","target":6,"annotations":[{"series":0,"index":2,"text":"Hubs launched"}]}'>
+    <h2>Revenue overtakes cost in 2025 and keeps climbing</h2>
+  </section>
+  <section class="layout-bottom" data-scene="waterfall" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"unit":" km","good":"down","data":[{"label":"Before","value":60},{"label":"Hubs","value":-9},{"label":"Routing","value":-5.2},{"label":"Volume","value":-2.5},{"label":"Longer trips","value":2},{"label":"After","value":45.3}]}' data-scene-steps="6">
+    <h2>Hubs did most of the work on km per order</h2>
+  </section>
+  <section class="layout-split-reverse" data-scene="matrix" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"x":{"label":"Effort","low":"Low","high":"High"},"y":{"label":"Impact","low":"Low","high":"High"},"quadrants":["Quick wins","Big bets","Fill-ins","Avoid"],"focus":"top-left","items":[{"label":"Hubs","x":0.3,"y":0.85,"highlight":true},{"label":"Auto-accept","x":0.45,"y":0.75},{"label":"Route optimiser","x":0.82,"y":0.7},{"label":"New app","x":0.85,"y":0.25},{"label":"Badges","x":0.2,"y":0.2}]}'>
+    <h2>Hubs are the quick win</h2>
+    <p class="lede">2×2 prioritisation matrix.</p>
+  </section>
+  <section class="layout-split" data-scene="scatter" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"x":{"label":"Orders per day","unit":""},"y":{"label":"Km per order","unit":" km"},"trend":true,"items":[{"x":36,"y":61},{"x":39,"y":58},{"x":42,"y":55},{"x":45,"y":52},{"x":48,"y":49},{"x":50,"y":47},{"x":53,"y":45,"label":"Sep","highlight":true},{"x":41,"y":50},{"x":47,"y":53}]}'>
+    <h2>Denser days cost fewer km per order</h2>
+  </section>
+  <section class="layout-top" data-scene="gantt" data-source="Illustrative test data" data-sticker="Illustrative" data-params='{"periods":["Q1","Q2","Q3","Q4"],"today":1.4,"rows":[{"label":"Hub leases","start":0,"end":1},{"label":"Acceptance v2","start":0.6,"end":2.4,"highlight":true,"note":"swap-out"},{"label":"Roster engine","start":1.5,"end":3.2},{"label":"Second city","start":2.8,"end":4}],"milestones":[{"at":1,"label":"Pilot live"},{"at":3.2,"label":"Scale"}]}'>
+    <h2>Acceptance v2 ships by Q3</h2>
+  </section>
+</main>
+
+  <script type="module">
+    import { createDeck } from './lib/threejs-slides.js';
+    // registerScene('my-scene', (ctx) => ({ object, update(t, dt, info) {} }));  — see references/custom-scenes.md
+    await createDeck();
+  </script>
+</body>
+</html>

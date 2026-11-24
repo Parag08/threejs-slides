@@ -14,7 +14,7 @@
   <style>/* deck-specific CSS */</style>
 </head>
 <body>
-  <main class="deck" data-journey="drift" data-bloom="0.4" data-ambient="stars" data-transition="1">
+  <main class="deck" data-journey="drift" data-ambient="stars" data-transition="1">
     <section …>…</section>
   </main>
   <script type="module">
@@ -30,12 +30,13 @@
 | Attribute | Values | Default |
 |---|---|---|
 | `data-journey` | `drift` · `line` · `dive` · `spiral` · `still` | `drift` |
-| `data-bloom` | 0 to 1.5 glow strength (0 turns it off) | 0.4 dark themes, 0 light themes |
+| `data-bloom` | 0 to 1.5 glow strength. Off by default: objects render as plain lit 3D. Opt in only for a deliberate neon look | 0 |
+| `data-brightness` | multiplies the colours of every 3D object in the deck (0.7 = 30% darker). Combines with each slide's own `data-brightness`. Labels are untouched | 1 |
 | `data-ambient` | `stars` · `dust` · `none` | `stars` |
 | `data-transition` | duration multiplier (0.6 is snappier, 1.4 is more cinematic) | 1 |
 | `data-dots` | slide dots: `auto` (always on the last slide; on other slides they appear when the pointer nears the bottom edge and hide 2s after it leaves) · `always` · `last` · `none` | `auto` |
 
-These can also be passed to `createDeck({ journey, bloom, ambient, transition, dots, parallax, chrome, clickToAdvance })`.
+These can also be passed to `createDeck({ journey, bloom, brightness, ambient, transition, dots, parallax, chrome, clickToAdvance })`.
 
 URL flags: `?static` (no motion: for screenshots and reduced motion), `?nochrome` (hides the progress bar and counter), `?quality=low` (DPR 1, no bloom), `?slide=4` or `#/4` (start slide).
 
@@ -55,12 +56,60 @@ Add one class to each `<section>`. All sizes are designed at 1920×1080.
 | `layout-section` | act divider | `.num`, `h2` |
 | `layout-stats` | 2–4 big numbers | `h2`, `.stats > .stat > .value + .label` |
 | `layout-cards` | 2–4 parallel ideas | `h2`, `.cards > .card > .icon + h3 + p` |
+| `layout-summary` | executive summary (answer first) | `h2`, `ol.summary > li > b + span`, 3–5 items |
+| `layout-compare` | before/after, situation/complication, A vs B | `h2`, `.compare > .col (+.is-key) > h3 + ul.points` or `p`; add `.no-arrow` to drop the → |
+| `layout-table` | options × criteria, P&L, risks, next steps | `h2`, `table.data` (`td.num` numbers, `td.c` centred, `tr.is-key` highlighted row) |
 
 Classes can be combined, e.g. `class="layout-stats layout-top"`.
 
 Text elements: `.kicker` (mono eyebrow with a rule), `h1` 148px, `h2` 96px, `h3` 46px, `.lede` 40px, `p`/`li` 32px, `.small` 24px, `ul.points`, `pre.code` (use `<span class="c|k|s">` for comment/keyword/string colours), `.chips > .chip`, `.accent`, `.muted`.
 
-Legibility (built in): no text colour can contrast with both a dark background and bright particles, so every slide gets (1) a background-coloured halo around each glyph and (2) a soft gradient scrim behind its text area, shaped per layout. When the 3D sits *behind* the text (title, center, statement, section, cards), the engine also dims it to 42%. Controls: `style="--scrim: 60%"` on a section for a lighter scrim, `class="no-scrim"` to remove it, `data-dim="1"` for full-strength 3D. Text colours: `--fg` for headlines and body, `--text-2` for secondary text (lede, card text, stat labels), `--muted` for captions only. Don't use `--accent` for running text over 3D; the kicker is a pale accent tint for that reason. `scrim-left` / `scrim-right` add an extra side gradient.
+Legibility (built in): no text colour can contrast with both a dark background and bright particles, so every slide gets a soft gradient scrim behind its text area, shaped per layout (text has no glow or halo). When the 3D sits *behind* the text (title, center, statement, section, cards), the engine also dims it to 42%. Controls: `style="--scrim: 60%"` on a section for a lighter scrim, `class="no-scrim"` to remove it, `data-dim="1"` for full-strength 3D. Text colours: `--fg` for headlines and body, `--text-2` for secondary text (lede, card text, stat labels), `--muted` for captions only. Don't use `--accent` for running text over 3D; the kicker is a pale accent tint for that reason. `scrim-left` / `scrim-right` add an extra side gradient.
+
+### Business layouts
+
+```html
+<section class="layout-summary">
+  <h2>Executive summary</h2>
+  <ol class="summary">
+    <li><b>Manual claiming lost a third of orders</b><span>Ops claimed in Excel, only when someone was at a desk</span></li>
+    <li><b>An acceptance engine now claims what the fleet can serve</b><span>Auto-accept beyond 24 h, ops decide inside it</span></li>
+  </ol>
+</section>
+
+<section class="layout-compare">
+  <h2>Hubs replaced office round trips</h2>
+  <div class="compare">
+    <div class="col"><h3>Before</h3><ul class="points"><li>Idle pairs drove back to the office</li></ul></div>
+    <div class="col is-key"><h3>After</h3><ul class="points"><li>Idle pairs wait at the nearest hub</li></ul></div>
+  </div>
+</section>
+
+<section class="layout-table" data-source="Team scoring, workshop 12 Nov">
+  <h2>Option B wins on cost and speed</h2>
+  <table class="data">
+    <thead><tr><th>Option</th><th class="c">Cost</th><th class="c">Speed</th><th class="c">Risk</th></tr></thead>
+    <tbody>
+      <tr><td>A · Build in-house</td><td class="c"><span class="harvey" data-v="1"></span></td><td class="c"><span class="harvey" data-v="2"></span></td><td class="c"><span class="mark no"></span></td></tr>
+      <tr class="is-key"><td>B · Low-code</td><td class="c"><span class="harvey" data-v="4"></span></td><td class="c"><span class="harvey" data-v="4"></span></td><td class="c"><span class="mark yes"></span></td></tr>
+    </tbody>
+  </table>
+</section>
+```
+
+Harvey balls: `<span class="harvey" data-v="0..4">` (empty → full). Marks: `<span class="mark yes|no|part">` (✓ ✗ ◐). Tables: 6 rows × 5 columns or fewer; past that, split or move detail to the appendix.
+
+### Consulting furniture
+
+| Attribute / element | Effect |
+|---|---|
+| acts | Every `layout-section` starts an act (its `.num` + `h2`). `data-appendix` on a section starts the appendix |
+| tracker | `02 · What I built` at the top-left of each content slide in an act. On by default when the deck has 2+ acts; `data-tracker="auto\|always\|none"` on `.deck`; `data-no-tracker` on a slide hides it there |
+| `data-source="…"` | Footnote at the bottom-left, prefixed "Source:". Put one on every slide with numbers. Or write `<div class="source">…</div>` (`.no-label` drops the prefix) |
+| `data-sticker="…"` | Status tag at the top-right: `Illustrative`, `Preliminary`, `Projection`, `Synthetic` |
+| `<span class="delta down good">25%</span>` | ▲/▼ change marker. `up`/`down` sets the arrow; `good`/`bad` sets the colour (accent / accent-2), because down can be good. Works inside `.stat .value`, `.label`, `p`, `li` |
+
+The furniture is part of the slide, so it appears in screenshots, PDFs and bundles.
 
 ### Density limits (per slide)
 - headline: 9 words or fewer

@@ -10,7 +10,12 @@
  *     · text or elements that spill outside the 1920×1080 stage
  *     · elements whose content overflows their box (scrollHeight/scrollWidth)
  *     · text smaller than 20px at stage scale (too small to read when projected)
+ * - Asks chart scenes which of their 3D labels are crossed by a line or overlap other labels
+ *   (deck.textCollisions()); text must never be cut through.
  * - Reports console errors, page errors and failed requests.
+ * - Story checks (advice, never fail the run): prints the ghost deck (every title in order, grouped
+ *   by act) and flags label-style titles on content slides, data slides without a source, and long
+ *   decks with no acts. Saved to <out>/ghost-deck.md.
  * - --pdf: one page per slide from the screenshots.
  *
  * Needs Playwright:  cd <skill>/scripts && npm install   (installs playwright + chromium)
@@ -85,7 +90,7 @@ for (let i = 0; i < count; i++) {
     const slide = window.deck.slides[i];
     const label = (el) => (el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '') + ' "' + (el.textContent || '').trim().slice(0, 40) + '"');
     slide.querySelectorAll('*').forEach((el) => {
-      if (el.closest('aside.notes, .notes')) return;
+      if (el.closest('aside.notes, .notes, .ts-sr-only')) return;
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') return;
       const r = el.getBoundingClientRect();
@@ -99,7 +104,7 @@ for (let i = 0; i < count; i++) {
       if (hasText && parseFloat(cs.fontSize) < 20 && !el.closest('.ts-chrome')) out.push(`text below 20px (${cs.fontSize}): ${label(el)}`);
     });
     // text elements that visually collide with each other (siblings only, cheap check)
-    const blocks = [...slide.querySelectorAll('h1,h2,h3,p,li,blockquote,pre,.card,.stat')];
+    const blocks = [...slide.querySelectorAll('h1,h2,h3,p,li,blockquote,pre,.card,.stat,.col,table,.tracker,.source,.sticker')].filter((b) => !b.closest('.ts-sr-only'));
     for (let a = 0; a < blocks.length; a++) for (let b = a + 1; b < blocks.length; b++) {
       if (blocks[a].contains(blocks[b]) || blocks[b].contains(blocks[a])) continue;
       const A = blocks[a].getBoundingClientRect(), B = blocks[b].getBoundingClientRect();
@@ -108,8 +113,40 @@ for (let i = 0; i < count; i++) {
     }
     return [...new Set(out)].slice(0, 12);
   }, i);
+  const crossed = await page.evaluate(() => window.deck.textCollisions?.() ?? []);
+  crossed.forEach((c) => issues.push(`3D text cut: ${c}`));
   report.push({ slide: i + 1, file: path.relative(process.cwd(), file), issues });
 }
+
+/* --- story checks: ghost deck + consulting lints (advice only) --- */
+const story = await page.evaluate(() => {
+  const CONTENT = ['layout-split', 'layout-split-reverse', 'layout-bottom', 'layout-top', 'layout-stats', 'layout-cards', 'layout-compare', 'layout-table']; // not summary: "Executive summary" is the convention there
+  const DATA_SCENES = ['bars', 'line', 'waterfall', 'scatter', 'matrix', 'gantt', 'donut', 'funnel', 'tornado'];
+  const clean = (t) => (t || '').replace(/\s+/g, ' ').trim();
+  const slides = [...window.deck.slides];
+  const rows = [], advice = [];
+  let acts = 0;
+  slides.forEach((el, i) => {
+    const c = el.classList;
+    const head = el.querySelector('h1, h2, blockquote');
+    const title = clean(head?.getAttribute('aria-label') || head?.textContent || el.dataset.title);
+    const isSection = c.contains('layout-section');
+    if (isSection && !el.hasAttribute('data-appendix')) acts++;
+    rows.push({ slide: i + 1, section: isSection, appendix: el.hasAttribute('data-appendix'), num: clean(el.querySelector('.num')?.textContent), title });
+    const isContent = CONTENT.some((k) => c.contains(k));
+    const words = title.split(' ').filter(Boolean).length;
+    if (isContent && words && words <= 3)
+      advice.push(`slide ${i + 1}: title "${title}" reads like a label. Write the takeaway as a sentence (e.g. "Km per order fell 25% after launch").`);
+    const isData = DATA_SCENES.includes(el.dataset.scene) || c.contains('layout-stats') || el.querySelector('[data-count], table.data .num, table.data .harvey');
+    if (isData && !el.querySelector('.source') && !el.dataset.source && !el.hasAttribute('data-no-source'))
+      advice.push(`slide ${i + 1}: data slide without a source. Add data-source="…" (or data-no-source if the numbers are self-evident).`);
+  });
+  if (slides.length >= 8 && acts === 0) advice.push(`no acts: ${slides.length} slides and no layout-section dividers. Group the slides into 3–5 acts (SKILL.md, Phase 2).`);
+  return { rows, advice };
+});
+const ghostLines = story.rows.map((r) => r.section ? { act: r.appendix ? 'Appendix' : `${r.num} ${r.title}`.trim() } : { line: `${String(r.slide).padStart(2, ' ')}. ${r.title || '(no title)'}` });
+const ghost = ghostLines.map((g) => (g.act ? `\n## ${g.act}` : g.line)).join('\n');
+await fs.writeFile(path.join(outDir, 'ghost-deck.md'), `# Ghost deck\n\nRead only these titles, in order. They should tell the whole story.\n${ghost}\n`);
 
 if (pdfPath) {
   const imgs = report.map((r) => `<img src="${pathToFileURL(path.resolve(r.file)).href}">`).join('');
@@ -134,7 +171,10 @@ for (const r of report) {
 }
 if (consoleErrors.length) { console.log('\nConsole errors:'); [...new Set(consoleErrors)].forEach((e) => console.log('  - ' + e)); }
 if (failed.length) { console.log('\nFailed requests:'); [...new Set(failed)].forEach((e) => console.log('  - ' + e)); }
+console.log('\nGhost deck (titles only, they should tell the story):');
+ghostLines.forEach((g) => console.log(g.act ? `  ${g.act}` : `    ${g.line}`));
+if (story.advice.length) { console.log('\nStory checks (advice):'); story.advice.forEach((a) => console.log('  · ' + a)); }
 if (pdfPath) console.log(`\nPDF: ${pdfPath}`);
 console.log(problems || consoleErrors.length || failed.length ? '\nIssues found — look at the screenshots and fix them.' : '\nNo issues found. Still look at every screenshot.');
-await fs.writeFile(path.join(outDir, 'report.json'), JSON.stringify({ slides: report, consoleErrors, failed }, null, 2));
+await fs.writeFile(path.join(outDir, 'report.json'), JSON.stringify({ slides: report, consoleErrors, failed, story }, null, 2));
 process.exit(problems || consoleErrors.some((e) => !e.startsWith('warn')) || failed.length ? 1 : 0);

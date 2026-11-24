@@ -54,7 +54,8 @@ Use it with `<section data-scene="rings" data-params='{"count":6}' data-scene-st
 
 The engine fades every slide's object in and out during transitions:
 - **Standard materials** (`MeshStandardMaterial`, `LineBasicMaterial`, `SpriteMaterial`, …) get `opacity = baseOpacity × fade` automatically; the engine sets `transparent = true`.
-- **ShaderMaterial**: declare a `uFade` uniform (`{ value: 0 }`) and multiply your output alpha by it. Set `transparent: true`.
+- **Labels must never be crossed.** Keep lines and shapes clear of `makeLabel` sprites. To get the automatic check in `qa.mjs`, build with `helpers.chartKit(ctx)` (its `label`, `rod`, `dashes(…, avoid)` and `path` register everything) and return `collisions: (cam) => K.collisions(cam)` from the scene.
+- **ShaderMaterial**: declare a `uFade` uniform (`{ value: 0 }`) and multiply your output alpha by it. Set `transparent: true`. Also declare `uBrightness: { value: 1 }` and multiply your output colour by it, so `data-brightness` (per slide or on `.deck`) can dim the scene.
 - If **you** animate a material's opacity yourself, return it in `fadeManaged: [material, …]` and multiply your value by `info.fade` in `update`.
 - Create all materials inside the factory; the engine collects them once.
 

@@ -121,9 +121,10 @@ No build step and no framework. Three.js loads from a CDN through an import map,
 
 | | |
 |---|---|
-| **12 scenes** | `galaxy` · `morph` · `globe` · `terrain` · `orbit` · `bars` · `network` · `knot` · `blob` · `tunnel` · `cubes` · `timeline`, plus `registerScene()` for your own (glTF models, screenshots in 3D, anything) |
+| **17 scenes** | `galaxy` · `morph` · `globe` · `terrain` · `orbit` · `network` · `knot` · `blob` · `tunnel` · `cubes` · `timeline`, plus `registerScene()` for your own (glTF models, screenshots in 3D, anything) |
+| **6 charts** | `bars` (grouped, stacked, 100%, horizontal, negatives, target line, delta bracket) · `line` (forecast + confidence band) · `waterfall` · `scatter` · `matrix` (2×2) · `gantt`, all sharing one chart kit: one-highlight colouring, step reveal, screen-reader tables |
 | **5 camera journeys** | `drift` · `line` · `dive` · `spiral` · `still`: how the camera travels between slides |
-| **10 layouts** | title, center, split, split-reverse, bottom, top, statement, section, stats, cards |
+| **13 layouts** | title, center, split, split-reverse, bottom, top, statement, section, stats, cards, plus the business formats summary, compare and table |
 | **5 themes** | `nebula` · `ember` · `aurora` · `paper` · `mono`; the CSS variables colour the 3D too, and custom brand themes take a few lines |
 | **Build steps** | `data-step` reveals text *and* drives the scene (morph to the next shape, highlight the next orbit item, advance the timeline) |
 | **Presenter features** | **slide dots** (click to jump, title on hover; shown on the last slide and when the mouse nears the bottom), a **Fullscreen button** (top centre, shown on slide 1 and on top-edge hover), speaker notes (N), F for fullscreen, deep links (`#/7`), keyboard, click, swipe and wheel navigation, progress bar |
